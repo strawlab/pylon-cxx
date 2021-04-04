@@ -5,7 +5,7 @@ license = "MIT OR Apache-2.0"
 version = "0.1.0"
 authors = ["Andrew Straw <strawman@astraw.com>"]
 edition = "2018"
-repository = "https://github.com/strawlab/strand-braid"
+repository = "https://github.com/strawlab/pylon-cxx"
 
 [dependencies]
 cxx = "0.4"
