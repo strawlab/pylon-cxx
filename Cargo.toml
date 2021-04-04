@@ -8,7 +8,7 @@ edition = "2018"
 repository = "https://github.com/strawlab/pylon-cxx"
 
 [dependencies]
-cxx = "0.4"
+cxx = "1.0"
 
 [build-dependencies]
 cxx-build = "0.4"
