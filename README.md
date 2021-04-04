@@ -38,6 +38,12 @@ export PYLON_CAMEMU=2
 $Env:PYLON_CAMEMU=2
 ```
 
+## Code of conduct
+
+Anyone who interacts with this software in any space, including but not limited
+to this GitHub repository, must follow our [code of
+conduct](code_of_conduct.md).
+
 ## License
 
 This crate is Copyright (C) 2020 Andrew Straw <strawman@astraw.com>.
