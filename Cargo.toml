@@ -1,5 +1,5 @@
 [package]
-name = "pylon-cxx-rs"
+name = "pylon-cxx"
 description = "Rust wrapper of the Pylon libraries for Basler cameras"
 license = "MIT OR Apache-2.0"
 version = "0.1.0"

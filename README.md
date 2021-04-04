@@ -1,5 +1,7 @@
 # pylon-cxx-rs
 
+[![Crates.io](https://img.shields.io/crates/v/pylon-cxx.svg)](https://crates.io/crates/pylon-cxx)
+
 Rust wrapper of the Pylon libraries for Basler cameras.
 
 ## Platform support

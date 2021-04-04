@@ -1,11 +1,11 @@
-use pylon_cxx_rs::NodeMap;
+use pylon_cxx::NodeMap;
 
-fn main() -> Result<(), pylon_cxx_rs::PylonError> {
+fn main() -> Result<(), pylon_cxx::PylonError> {
     // Before using any pylon methods, the pylon runtime must be initialized.
-    let _pylon = pylon_cxx_rs::PylonAutoInit::new();
+    let _pylon = pylon_cxx::PylonAutoInit::new();
 
     // Create an instant camera object with the camera device found first.
-    let camera = pylon_cxx_rs::TlFactory::instance().create_first_device()?;
+    let camera = pylon_cxx::TlFactory::instance().create_first_device()?;
 
     camera.open()?;
 
