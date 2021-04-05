@@ -2,7 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/pylon-cxx.svg)](https://crates.io/crates/pylon-cxx)
 
-Rust wrapper of the Pylon libraries for Basler cameras.
+Rust wrapper of the Pylon libraries for Basler cameras using [CXX](https://crates.io/crates/cxx).
 
 ## Platform support
 
