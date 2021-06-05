@@ -59,7 +59,7 @@ namespace Pylon
     uint32_t grab_result_offset_y(const std::unique_ptr<CGrabResultPtr> &grab_result);
     uint32_t grab_result_padding_x(const std::unique_ptr<CGrabResultPtr> &grab_result);
     uint32_t grab_result_padding_y(const std::unique_ptr<CGrabResultPtr> &grab_result);
-    rust::Slice<uint8_t> grab_result_buffer(const std::unique_ptr<CGrabResultPtr> &);
+    rust::Slice<const uint8_t> grab_result_buffer(const std::unique_ptr<CGrabResultPtr> &);
     uint32_t grab_result_payload_size(const std::unique_ptr<CGrabResultPtr> &);
     uint32_t grab_result_buffer_size(const std::unique_ptr<CGrabResultPtr> &);
 
