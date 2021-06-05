@@ -228,11 +228,11 @@ pub struct BooleanNode {
 
 impl BooleanNode {
     pub fn value(&self) -> PylonResult<bool> {
-        ffi::boolean_node_get_value(&self.inner).to_rust()
+        ffi::boolean_node_get_value(&self.inner).into_rust()
     }
 
     pub fn set_value(&mut self, value: bool) -> PylonResult<()> {
-        ffi::boolean_node_set_value(&self.inner, value).to_rust()
+        ffi::boolean_node_set_value(&self.inner, value).into_rust()
     }
 }
 
@@ -247,19 +247,19 @@ impl IntegerNode {
     }
 
     pub fn value(&self) -> PylonResult<i64> {
-        ffi::integer_node_get_value(&self.inner).to_rust()
+        ffi::integer_node_get_value(&self.inner).into_rust()
     }
 
     pub fn min(&self) -> PylonResult<i64> {
-        ffi::integer_node_get_min(&self.inner).to_rust()
+        ffi::integer_node_get_min(&self.inner).into_rust()
     }
 
     pub fn max(&self) -> PylonResult<i64> {
-        ffi::integer_node_get_max(&self.inner).to_rust()
+        ffi::integer_node_get_max(&self.inner).into_rust()
     }
 
     pub fn set_value(&mut self, value: i64) -> PylonResult<()> {
-        ffi::integer_node_set_value(&self.inner, value).to_rust()
+        ffi::integer_node_set_value(&self.inner, value).into_rust()
     }
 }
 
@@ -274,19 +274,19 @@ impl FloatNode {
     }
 
     pub fn value(&self) -> PylonResult<f64> {
-        ffi::float_node_get_value(&self.inner).to_rust()
+        ffi::float_node_get_value(&self.inner).into_rust()
     }
 
     pub fn min(&self) -> PylonResult<f64> {
-        ffi::float_node_get_min(&self.inner).to_rust()
+        ffi::float_node_get_min(&self.inner).into_rust()
     }
 
     pub fn max(&self) -> PylonResult<f64> {
-        ffi::float_node_get_max(&self.inner).to_rust()
+        ffi::float_node_get_max(&self.inner).into_rust()
     }
 
     pub fn set_value(&mut self, value: f64) -> PylonResult<()> {
-        ffi::float_node_set_value(&self.inner, value).to_rust()
+        ffi::float_node_set_value(&self.inner, value).into_rust()
     }
 }
 
@@ -300,10 +300,10 @@ impl EnumNode {
         Ok(cstr.to_str()?.to_string())
     }
     pub fn settable_values(&self) -> PylonResult<Vec<String>> {
-        ffi::enum_node_settable_values(&self.inner)?.to_rust()
+        ffi::enum_node_settable_values(&self.inner)?.into_rust()
     }
     pub fn set_value(&mut self, value: &str) -> PylonResult<()> {
-        ffi::enum_node_set_value(&self.inner, value).to_rust()
+        ffi::enum_node_set_value(&self.inner, value).into_rust()
     }
 }
 
@@ -343,28 +343,28 @@ impl InstantCamera {
     }
 
     pub fn open(&self) -> PylonResult<()> {
-        ffi::instant_camera_open(&self.inner).to_rust()
+        ffi::instant_camera_open(&self.inner).into_rust()
     }
 
     pub fn is_open(&self) -> PylonResult<bool> {
-        ffi::instant_camera_is_open(&self.inner).to_rust()
+        ffi::instant_camera_is_open(&self.inner).into_rust()
     }
 
     pub fn close(&self) -> PylonResult<()> {
-        ffi::instant_camera_close(&self.inner).to_rust()
+        ffi::instant_camera_close(&self.inner).into_rust()
     }
 
     pub fn start_grabbing(&self, options: &GrabOptions) -> PylonResult<()> {
         match options.count {
-            None => ffi::instant_camera_start_grabbing(&self.inner).to_rust(),
+            None => ffi::instant_camera_start_grabbing(&self.inner).into_rust(),
             Some(count) => {
-                ffi::instant_camera_start_grabbing_with_count(&self.inner, count).to_rust()
+                ffi::instant_camera_start_grabbing_with_count(&self.inner, count).into_rust()
             }
         }
     }
 
     pub fn stop_grabbing(&self) -> PylonResult<()> {
-        ffi::instant_camera_stop_grabbing(&self.inner).to_rust()
+        ffi::instant_camera_stop_grabbing(&self.inner).into_rust()
     }
 
     pub fn is_grabbing(&self) -> bool {
@@ -384,7 +384,7 @@ impl InstantCamera {
             &mut grab_result.inner,
             timeout_handling,
         )
-        .to_rust()
+        .into_rust()
     }
 }
 
@@ -402,80 +402,80 @@ impl GrabResult {
     }
 
     pub fn grab_succeeded(&self) -> PylonResult<bool> {
-        ffi::grab_result_grab_succeeded(&self.inner).to_rust()
+        ffi::grab_result_grab_succeeded(&self.inner).into_rust()
     }
 
     pub fn error_description(&self) -> PylonResult<String> {
-        ffi::grab_result_error_description(&self.inner).to_rust()
+        ffi::grab_result_error_description(&self.inner).into_rust()
     }
 
     pub fn error_code(&self) -> PylonResult<u32> {
-        ffi::grab_result_error_code(&self.inner).to_rust()
+        ffi::grab_result_error_code(&self.inner).into_rust()
     }
 
     pub fn width(&self) -> PylonResult<u32> {
-        ffi::grab_result_width(&self.inner).to_rust()
+        ffi::grab_result_width(&self.inner).into_rust()
     }
 
     pub fn height(&self) -> PylonResult<u32> {
-        ffi::grab_result_height(&self.inner).to_rust()
+        ffi::grab_result_height(&self.inner).into_rust()
     }
 
     pub fn offset_x(&self) -> PylonResult<u32> {
-        ffi::grab_result_offset_x(&self.inner).to_rust()
+        ffi::grab_result_offset_x(&self.inner).into_rust()
     }
 
     pub fn offset_y(&self) -> PylonResult<u32> {
-        ffi::grab_result_offset_y(&self.inner).to_rust()
+        ffi::grab_result_offset_y(&self.inner).into_rust()
     }
 
     pub fn padding_x(&self) -> PylonResult<u32> {
-        ffi::grab_result_padding_x(&self.inner).to_rust()
+        ffi::grab_result_padding_x(&self.inner).into_rust()
     }
 
     pub fn padding_y(&self) -> PylonResult<u32> {
-        ffi::grab_result_padding_y(&self.inner).to_rust()
+        ffi::grab_result_padding_y(&self.inner).into_rust()
     }
 
     pub fn buffer(&self) -> PylonResult<&[u8]> {
-        ffi::grab_result_buffer(&self.inner).to_rust()
+        ffi::grab_result_buffer(&self.inner).into_rust()
     }
 
     pub fn payload_size(&self) -> PylonResult<u32> {
-        ffi::grab_result_payload_size(&self.inner).to_rust()
+        ffi::grab_result_payload_size(&self.inner).into_rust()
     }
 
     pub fn buffer_size(&self) -> PylonResult<u32> {
-        ffi::grab_result_buffer_size(&self.inner).to_rust()
+        ffi::grab_result_buffer_size(&self.inner).into_rust()
     }
 
     pub fn block_id(&self) -> PylonResult<u64> {
-        ffi::grab_result_block_id(&self.inner).to_rust()
+        ffi::grab_result_block_id(&self.inner).into_rust()
     }
 
     pub fn time_stamp(&self) -> PylonResult<u64> {
-        ffi::grab_result_time_stamp(&self.inner).to_rust()
+        ffi::grab_result_time_stamp(&self.inner).into_rust()
     }
 
     pub fn stride(&self) -> PylonResult<usize> {
-        // ffi::grab_result_stride(&self.inner).to_rust()
-        ffi::grab_result_stride(&self.inner).to_rust()
+        // ffi::grab_result_stride(&self.inner).into_rust()
+        ffi::grab_result_stride(&self.inner).into_rust()
     }
 
     pub fn image_size(&self) -> PylonResult<u32> {
-        ffi::grab_result_image_size(&self.inner).to_rust()
+        ffi::grab_result_image_size(&self.inner).into_rust()
     }
 
 }
 
 trait CxxResultExt {
     type RustResult;
-    fn to_rust(self) -> Self::RustResult;
+    fn into_rust(self) -> Self::RustResult;
 }
 
 impl CxxResultExt for cxx::UniquePtr<cxx::CxxVector<cxx::CxxString>> {
     type RustResult = PylonResult<Vec<String>>;
-    fn to_rust(self) -> Self::RustResult {
+    fn into_rust(self) -> Self::RustResult {
         // This needs to return a Result (and cannot move the data, but rather
         // copy) because we need to ensure the strings are correct UTF8.
         Ok(self
@@ -487,7 +487,7 @@ impl CxxResultExt for cxx::UniquePtr<cxx::CxxVector<cxx::CxxString>> {
 
 impl<T> CxxResultExt for Result<T, cxx::Exception> {
     type RustResult = PylonResult<T>;
-    fn to_rust(self) -> Self::RustResult {
+    fn into_rust(self) -> Self::RustResult {
         self.map_err(PylonError::from)
     }
 }
@@ -502,7 +502,7 @@ pub trait HasProperties {
 
 impl HasProperties for DeviceInfo {
     fn property_names(&self) -> PylonResult<Vec<String>> {
-        ffi::device_info_get_property_names(&self.inner)?.to_rust()
+        ffi::device_info_get_property_names(&self.inner)?.into_rust()
     }
 
     fn property_value(&self, name: &str) -> PylonResult<String> {
@@ -512,7 +512,7 @@ impl HasProperties for DeviceInfo {
 
 impl DeviceInfo {
     pub fn model_name(&self) -> PylonResult<String> {
-        ffi::device_info_get_model_name(&self.inner).to_rust()
+        ffi::device_info_get_model_name(&self.inner).into_rust()
     }
 }
 

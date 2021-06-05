@@ -69,7 +69,7 @@ fn main() {
         let mut pylon_include_dir = include_dir.clone();
         pylon_include_dir.push("pylon");
 
-        let mut lib_dir = pylon_dev_dir.clone();
+        let mut lib_dir = pylon_dev_dir;
         lib_dir.push("lib");
         lib_dir.push("x64");
 
