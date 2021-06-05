@@ -11,4 +11,4 @@ repository = "https://github.com/strawlab/pylon-cxx"
 cxx = "1.0"
 
 [build-dependencies]
-cxx-build = "0.4"
+cxx-build = "1.0"
