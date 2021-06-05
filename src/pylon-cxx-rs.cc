@@ -277,13 +277,13 @@ namespace Pylon
         return (*grab_result)->GetPaddingY();
     }
 
-    rust::Slice<uint8_t> grab_result_buffer(const std::unique_ptr<CGrabResultPtr> &grab_result)
+    rust::Slice<const uint8_t> grab_result_buffer(const std::unique_ptr<CGrabResultPtr> &grab_result)
     {
         auto buf = (*grab_result)->GetBuffer();
         auto sz = (*grab_result)->GetBufferSize();
 
-        return rust::Slice<uint8_t>(reinterpret_cast<const uint8_t *>(buf),
-                                    sz);
+        return rust::Slice<const uint8_t>(reinterpret_cast<const uint8_t *>(buf),
+                                          sz);
     }
 
     uint32_t grab_result_payload_size(const std::unique_ptr<CGrabResultPtr> &grab_result)

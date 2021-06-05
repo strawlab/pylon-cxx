@@ -32,7 +32,7 @@ mod ffi {
         ThrowException,
     }
 
-    extern "C" {
+    unsafe extern "C++" {
         include!("pylon/PylonIncludes.h");
         include!("pylon/gige/BaslerGigECamera.h");
         include!("catcher.h");

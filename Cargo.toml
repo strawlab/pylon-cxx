@@ -10,7 +10,7 @@ keywords = ["basler", "camera", "bindings", "pylon", "image"]
 categories = ["api-bindings", "external-ffi-bindings", "hardware-support", "multimedia::images"]
 
 [dependencies]
-cxx = "0.4"
+cxx = "1.0"
 
 [build-dependencies]
-cxx-build = "0.4"
+cxx-build = "1.0"
