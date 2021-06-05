@@ -441,6 +441,14 @@ impl GrabResult {
         ffi::grab_result_buffer(&self.inner).to_rust()
     }
 
+    pub fn payload_size(&self) -> PylonResult<u32> {
+        ffi::grab_result_payload_size(&self.inner).to_rust()
+    }
+
+    pub fn buffer_size(&self) -> PylonResult<u32> {
+        ffi::grab_result_buffer_size(&self.inner).to_rust()
+    }
+
     pub fn block_id(&self) -> PylonResult<u64> {
         ffi::grab_result_block_id(&self.inner).to_rust()
     }
@@ -453,6 +461,11 @@ impl GrabResult {
         // ffi::grab_result_stride(&self.inner).to_rust()
         ffi::grab_result_stride(&self.inner).to_rust()
     }
+
+    pub fn image_size(&self) -> PylonResult<u32> {
+        ffi::grab_result_image_size(&self.inner).to_rust()
+    }
+
 }
 
 trait CxxResultExt {
