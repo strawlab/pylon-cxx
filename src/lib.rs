@@ -1,25 +1,47 @@
+#![cfg_attr(feature = "backtrace", feature(backtrace))]
+
+#[cfg(feature = "backtrace")]
+use std::backtrace::Backtrace;
+
 #[derive(Debug)]
-pub struct PylonError(String);
+pub struct PylonError {
+    msg: String,
+    #[cfg(feature = "backtrace")]
+    backtrace: Backtrace,
+}
 
 impl From<cxx::Exception> for PylonError {
     fn from(orig: cxx::Exception) -> PylonError {
-        PylonError(orig.what().into())
+        PylonError {
+            msg: orig.what().into(),
+            #[cfg(feature = "backtrace")]
+            backtrace: Backtrace::capture(),
+        }
     }
 }
 
 impl From<std::str::Utf8Error> for PylonError {
     fn from(_: std::str::Utf8Error) -> PylonError {
-        PylonError("Cannot convert C++ string to UTF-8".to_string())
+        PylonError {
+            msg: "Cannot convert C++ string to UTF-8".to_string(),
+            #[cfg(feature = "backtrace")]
+            backtrace: Backtrace::capture(),
+        }
     }
 }
 
 impl std::fmt::Display for PylonError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "PylonError({})", self.0)
+        write!(f, "PylonError({})", self.msg)
     }
 }
 
-impl std::error::Error for PylonError {}
+impl std::error::Error for PylonError {
+    #[cfg(feature = "backtrace")]
+    fn backtrace(&self) -> Option<&std::backtrace::Backtrace> {
+        Some(&self.backtrace)
+    }
+}
 
 type PylonResult<T> = Result<T, PylonError>;
 

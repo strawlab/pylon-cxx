@@ -17,3 +17,6 @@ cxx-build = "1.0"
 
 [dev-dependencies]
 anyhow = "1"
+
+[features]
+backtrace = ["anyhow/backtrace"]
