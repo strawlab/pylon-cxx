@@ -19,4 +19,4 @@ cxx-build = "1.0"
 anyhow = "1"
 
 [features]
-backtrace = ["anyhow/backtrace"]
+backtrace = []
