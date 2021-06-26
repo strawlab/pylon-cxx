@@ -512,7 +512,6 @@ impl GrabResult {
     pub fn image_size(&self) -> PylonResult<u32> {
         ffi::grab_result_image_size(&self.inner).into_rust()
     }
-
 }
 
 trait CxxResultExt {
