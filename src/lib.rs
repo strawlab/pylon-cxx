@@ -46,6 +46,7 @@ mod ffi {
         type CIntegerParameter;
         type CFloatParameter;
         type CEnumParameter;
+        type CCommandParameter;
 
         fn PylonInitialize();
         fn PylonTerminate(ShutDownLogging: bool);
@@ -92,6 +93,11 @@ mod ffi {
             name: &str,
         ) -> Result<UniquePtr<CEnumParameter>>;
 
+        fn node_map_get_command_parameter(
+            camera: &UniquePtr<CInstantCamera>,
+            name: &str,
+        ) -> Result<UniquePtr<CCommandParameter>>;
+
         fn boolean_node_get_value(boolean_node: &UniquePtr<CBooleanParameter>) -> Result<bool>;
         fn boolean_node_set_value(
             boolean_node: &UniquePtr<CBooleanParameter>,
@@ -117,6 +123,8 @@ mod ffi {
             enum_node: &UniquePtr<CEnumParameter>,
         ) -> Result<UniquePtr<CxxVector<CxxString>>>;
         fn enum_node_set_value(enum_node: &UniquePtr<CEnumParameter>, value: &str) -> Result<()>;
+
+        fn command_node_execute(node: &UniquePtr<CCommandParameter>, verify: bool) -> Result<()>;
 
         fn new_grab_result_ptr() -> Result<UniquePtr<CGrabResultPtr>>;
         fn grab_result_grab_succeeded(grab_result: &UniquePtr<CGrabResultPtr>) -> Result<bool>;
@@ -307,11 +315,22 @@ impl EnumNode {
     }
 }
 
+pub struct CommandNode {
+    inner: cxx::UniquePtr<ffi::CCommandParameter>,
+}
+
+impl CommandNode {
+    pub fn execute(&self, verify: bool) -> PylonResult<()> {
+        ffi::command_node_execute(&self.inner, verify).into_rust()
+    }
+}
+
 pub trait NodeMap {
     fn boolean_node(&self, name: &str) -> PylonResult<BooleanNode>;
     fn integer_node(&self, name: &str) -> PylonResult<IntegerNode>;
     fn float_node(&self, name: &str) -> PylonResult<FloatNode>;
     fn enum_node(&self, name: &str) -> PylonResult<EnumNode>;
+    fn command_node(&self, name: &str) -> PylonResult<CommandNode>;
 }
 
 unsafe impl Send for InstantCamera {}
@@ -332,6 +351,10 @@ impl NodeMap for InstantCamera {
     fn enum_node(&self, name: &str) -> PylonResult<EnumNode> {
         let inner = ffi::node_map_get_enum_parameter(&self.inner, name)?;
         Ok(EnumNode { inner })
+    }
+    fn command_node(&self, name: &str) -> PylonResult<CommandNode> {
+        let inner = ffi::node_map_get_command_parameter(&self.inner, name)?;
+        Ok(CommandNode { inner })
     }
 }
 

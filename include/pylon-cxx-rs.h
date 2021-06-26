@@ -29,6 +29,7 @@ namespace Pylon
     std::unique_ptr<CIntegerParameter> node_map_get_integer_parameter(const std::unique_ptr<CInstantCamera> &, rust::Str);
     std::unique_ptr<CFloatParameter> node_map_get_float_parameter(const std::unique_ptr<CInstantCamera> &, rust::Str);
     std::unique_ptr<CEnumParameter> node_map_get_enum_parameter(const std::unique_ptr<CInstantCamera> &, rust::Str);
+    std::unique_ptr<CCommandParameter> node_map_get_command_parameter(const std::unique_ptr<CInstantCamera> &, rust::Str);
 
     bool boolean_node_get_value(const std::unique_ptr<CBooleanParameter> &);
     void boolean_node_set_value(const std::unique_ptr<CBooleanParameter> &, bool);
@@ -48,6 +49,8 @@ namespace Pylon
     std::unique_ptr<std::string> enum_node_get_value(const std::unique_ptr<CEnumParameter> &);
     std::unique_ptr<std::vector<std::string>> enum_node_settable_values(const std::unique_ptr<CEnumParameter> &);
     void enum_node_set_value(const std::unique_ptr<CEnumParameter> &, rust::Str);
+
+    void command_node_execute(const std::unique_ptr<CCommandParameter> &, bool);
 
     std::unique_ptr<CGrabResultPtr> new_grab_result_ptr();
     bool grab_result_grab_succeeded(const std::unique_ptr<CGrabResultPtr> &);

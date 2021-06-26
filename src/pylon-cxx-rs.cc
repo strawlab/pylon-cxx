@@ -132,6 +132,13 @@ namespace Pylon
         return std::make_unique<CEnumParameter>(CEnumParameter(nodemap, name));
     }
 
+    std::unique_ptr<CCommandParameter> node_map_get_command_parameter(const std::unique_ptr<CInstantCamera> &camera, rust::Str c_name)
+    {
+        GenApi::INodeMap &nodemap = camera->GetNodeMap();
+        Pylon::String_t name = Pylon::String_t(c_name.data(), c_name.length());
+        return std::make_unique<CCommandParameter>(CCommandParameter(nodemap, name));
+    }
+
     bool boolean_node_get_value(const std::unique_ptr<CBooleanParameter> &node)
     {
         return node->GetValue();
@@ -208,6 +215,11 @@ namespace Pylon
     {
         Pylon::String_t value = Pylon::String_t(c_value.data(), c_value.length());
         enum_node->SetValue(value);
+    }
+
+    void command_node_execute(const std::unique_ptr<CCommandParameter> &command_node, bool verify)
+    {
+        command_node->Execute(verify);
     }
 
     // CGrabResultPtr
