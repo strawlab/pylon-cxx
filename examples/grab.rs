@@ -1,6 +1,6 @@
 const COUNT_IMAGES_TO_GRAB: u32 = 100;
 
-fn main() -> Result<(), pylon_cxx::PylonError> {
+fn main() -> anyhow::Result<()> {
     // Before using any pylon methods, the pylon runtime must be initialized.
     let _pylon = pylon_cxx::PylonAutoInit::new();
 
