@@ -185,7 +185,6 @@ pub struct PylonAutoInit {}
 impl PylonAutoInit {
     pub fn new() -> Self {
         ffi::PylonInitialize();
-        // println!("pylon initialized");
         Self {}
     }
 }
@@ -193,7 +192,6 @@ impl PylonAutoInit {
 impl Default for PylonAutoInit {
     fn default() -> Self {
         ffi::PylonInitialize();
-        // println!("pylon initialized");
         Self {}
     }
 }
@@ -201,7 +199,6 @@ impl Default for PylonAutoInit {
 impl Drop for PylonAutoInit {
     fn drop(&mut self) {
         ffi::PylonTerminate(true);
-        // println!("pylon terminated");
     }
 }
 
