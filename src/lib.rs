@@ -231,10 +231,7 @@ impl Default for GrabOptions {
 
 impl GrabOptions {
     pub fn count(self, count: u32) -> GrabOptions {
-        Self {
-            count: Some(count),
-            ..self
-        }
+        Self { count: Some(count) }
     }
 }
 
