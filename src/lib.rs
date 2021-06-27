@@ -3,17 +3,46 @@
 #[cfg(feature = "backtrace")]
 use std::backtrace::Backtrace;
 
+mod error;
+
 #[derive(Debug)]
 pub struct PylonError {
     msg: String,
+    kind: ErrorKind,
     #[cfg(feature = "backtrace")]
     backtrace: Backtrace,
 }
 
+impl PylonError {
+    pub fn kind(&self) -> ErrorKind {
+        self.kind
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum ErrorKind {
+    AccessException,
+    #[cfg(target_os="windows")]
+    AviWriterFatalException,
+    BadAllocException,
+    DynamicCastException,
+    InvalidArgumentException,
+    LogicalErrorException,
+    OutOfRangeException,
+    PropertyException,
+    RuntimeException,
+    TimeoutException,
+    GenericException,
+    StdCppException,
+    Utf8Error,
+}
+
 impl From<cxx::Exception> for PylonError {
     fn from(orig: cxx::Exception) -> PylonError {
+        let (msg, kind) = error::to_msg_and_kind(orig.what());
         PylonError {
-            msg: orig.what().into(),
+            msg,
+            kind,
             #[cfg(feature = "backtrace")]
             backtrace: Backtrace::capture(),
         }
@@ -22,8 +51,10 @@ impl From<cxx::Exception> for PylonError {
 
 impl From<std::str::Utf8Error> for PylonError {
     fn from(_: std::str::Utf8Error) -> PylonError {
+        let kind = ErrorKind::Utf8Error;
         PylonError {
             msg: "Cannot convert C++ string to UTF-8".to_string(),
+            kind,
             #[cfg(feature = "backtrace")]
             backtrace: Backtrace::capture(),
         }
@@ -32,7 +63,7 @@ impl From<std::str::Utf8Error> for PylonError {
 
 impl std::fmt::Display for PylonError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "PylonError({})", self.msg)
+        write!(f, "PylonError::{:?}({})", self.kind, self.msg)
     }
 }
 
