@@ -72,6 +72,12 @@ mod ffi {
 
         fn PylonInitialize();
         fn PylonTerminate(ShutDownLogging: bool);
+        unsafe fn GetPylonVersion(
+            major: *mut u32,
+            minor: *mut u32,
+            subminor: *mut u32,
+            build: *mut u32,
+        );
 
         fn tl_factory_create_first_device() -> Result<UniquePtr<CInstantCamera>>;
         fn tl_factory_create_device(device_info: &CDeviceInfo)
@@ -199,6 +205,30 @@ impl Default for PylonAutoInit {
 impl Drop for PylonAutoInit {
     fn drop(&mut self) {
         ffi::PylonTerminate(true);
+    }
+}
+
+#[derive(Debug)]
+pub struct PylonVersion {
+    pub major: u32,
+    pub minor: u32,
+    pub subminor: u32,
+    pub build: u32,
+}
+
+pub fn pylon_version() -> PylonVersion {
+    let mut major = 0;
+    let mut minor = 0;
+    let mut subminor = 0;
+    let mut build = 0;
+    unsafe {
+        ffi::GetPylonVersion(&mut major, &mut minor, &mut subminor, &mut build);
+    }
+    PylonVersion {
+        major,
+        minor,
+        subminor,
+        build,
     }
 }
 
