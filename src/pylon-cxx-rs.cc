@@ -292,7 +292,7 @@ namespace Pylon
     rust::Slice<const uint8_t> grab_result_buffer(const std::unique_ptr<CGrabResultPtr> &grab_result)
     {
         auto buf = (*grab_result)->GetBuffer();
-        auto sz = (*grab_result)->GetBufferSize();
+        auto sz = (*grab_result)->GetImageSize();
 
         return rust::Slice<const uint8_t>(reinterpret_cast<const uint8_t *>(buf),
                                           sz);
@@ -305,7 +305,7 @@ namespace Pylon
 
     uint32_t grab_result_buffer_size(const std::unique_ptr<CGrabResultPtr> &grab_result)
     {
-        return (*grab_result)->GetBufferSize();
+        return (*grab_result)->GetImageSize();
     }
 
     uint64_t grab_result_block_id(const std::unique_ptr<CGrabResultPtr> &grab_result)
