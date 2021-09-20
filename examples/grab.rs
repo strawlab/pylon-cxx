@@ -10,7 +10,7 @@ fn main() -> anyhow::Result<()> {
     let camera = pylon_cxx::TlFactory::instance().create_first_device()?;
 
     // Print the model name of the camera.
-    println!("Using device {:?}", camera.device_info().model_name());
+    println!("Using device {:?}", camera.device_info().model_name()?);
 
     // Start the grabbing of COUNT_IMAGES_TO_GRAB images.
     // The camera device is parameterized with a default configuration which
