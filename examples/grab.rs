@@ -1,3 +1,5 @@
+use pylon_cxx::NodeMap;
+
 const COUNT_IMAGES_TO_GRAB: u32 = 100;
 
 fn main() -> anyhow::Result<()> {
@@ -14,6 +16,14 @@ fn main() -> anyhow::Result<()> {
     // The camera device is parameterized with a default configuration which
     // sets up free-running continuous acquisition.
     camera.start_grabbing(&pylon_cxx::GrabOptions::default().count(COUNT_IMAGES_TO_GRAB))?;
+
+    match camera.enum_node("PixelFormat") {
+        Ok(node) => println!(
+            "pixel format: {}",
+            node.value().unwrap_or("could not read value".to_string())
+        ),
+        Err(e) => eprintln!("Ignoring error getting PixelFormat node: {}", e),
+    };
 
     let mut grab_result = pylon_cxx::GrabResult::new()?;
 
@@ -34,7 +44,7 @@ fn main() -> anyhow::Result<()> {
             println!("SizeY: {}", grab_result.height()?);
 
             let image_buffer = grab_result.buffer()?;
-            println!("Gray value of first pixel: {}\n", image_buffer[0]);
+            println!("Value of first pixel: {}\n", image_buffer[0]);
         } else {
             println!(
                 "Error: {} {}",
