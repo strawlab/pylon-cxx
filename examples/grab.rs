@@ -12,6 +12,10 @@ fn main() -> anyhow::Result<()> {
     // Print the model name of the camera.
     println!("Using device {:?}", camera.device_info().model_name()?);
 
+    camera.open()?;
+
+    // camera.enum_node("PixelFormat")?.set_value("RGB8")?;
+
     // Start the grabbing of COUNT_IMAGES_TO_GRAB images.
     // The camera device is parameterized with a default configuration which
     // sets up free-running continuous acquisition.
