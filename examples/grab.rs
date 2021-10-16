@@ -4,10 +4,10 @@ const COUNT_IMAGES_TO_GRAB: u32 = 100;
 
 fn main() -> anyhow::Result<()> {
     // Before using any pylon methods, the pylon runtime must be initialized.
-    let _pylon = pylon_cxx::PylonAutoInit::new();
+    let pylon = pylon_cxx::Pylon::new();
 
     // Create an instant camera object with the camera device found first.
-    let camera = pylon_cxx::TlFactory::instance().create_first_device()?;
+    let camera = pylon_cxx::TlFactory::instance(&pylon).create_first_device()?;
 
     // Print the model name of the camera.
     println!("Using device {:?}", camera.device_info().model_name()?);

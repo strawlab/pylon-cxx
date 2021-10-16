@@ -2,9 +2,9 @@ use pylon_cxx::HasProperties;
 
 fn main() -> anyhow::Result<()> {
     // Before using any pylon methods, the pylon runtime must be initialized.
-    let _pylon = pylon_cxx::PylonAutoInit::new();
+    let pylon = pylon_cxx::Pylon::new();
 
-    for device in pylon_cxx::TlFactory::instance().enumerate_devices()? {
+    for device in pylon_cxx::TlFactory::instance(&pylon).enumerate_devices()? {
         println!(
             "Device {} {} -------------",
             device.property_value("VendorName")?,

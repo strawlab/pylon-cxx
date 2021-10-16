@@ -2,9 +2,9 @@ use pylon_cxx::{HasProperties, NodeMap};
 
 fn main() -> anyhow::Result<()> {
     // Before using any pylon methods, the pylon runtime must be initialized.
-    let _pylon = pylon_cxx::PylonAutoInit::new();
+    let pylon = pylon_cxx::Pylon::new();
 
-    let tl_factory = pylon_cxx::TlFactory::instance();
+    let tl_factory = pylon_cxx::TlFactory::instance(&pylon);
     for device in tl_factory.enumerate_devices()? {
         println!(
             "Device {} {} -------------",

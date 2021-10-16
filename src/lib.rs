@@ -186,23 +186,23 @@ mod ffi {
 }
 pub use ffi::TimeoutHandling;
 
-pub struct PylonAutoInit {}
+pub struct Pylon {}
 
-impl PylonAutoInit {
+impl Pylon {
     pub fn new() -> Self {
         ffi::PylonInitialize();
         Self {}
     }
 }
 
-impl Default for PylonAutoInit {
+impl Default for Pylon {
     fn default() -> Self {
         ffi::PylonInitialize();
         Self {}
     }
 }
 
-impl Drop for PylonAutoInit {
+impl Drop for Pylon {
     fn drop(&mut self) {
         ffi::PylonTerminate(true);
     }
@@ -236,19 +236,21 @@ pub fn pylon_version() -> PylonVersion {
 // Since in C++ `CTlFactory::GetInstance()` merely returns a reference to
 // a static object, here we don't store anything and instead get the
 // reference when needed.
-pub struct TlFactory {}
+pub struct TlFactory<'a> {
+    lib: &'a Pylon,
+}
 
-impl TlFactory {
-    pub fn instance() -> Self {
-        Self {}
+impl<'a> TlFactory<'a> {
+    pub fn instance(lib: &'a Pylon) -> Self {
+        Self {lib}
     }
-    pub fn create_first_device(&self) -> PylonResult<InstantCamera> {
+    pub fn create_first_device(&self) -> PylonResult<InstantCamera<'a>> {
         let inner = ffi::tl_factory_create_first_device()?;
-        Ok(InstantCamera { inner })
+        Ok(InstantCamera { lib: self.lib, inner })
     }
-    pub fn create_device(&self, device_info: &DeviceInfo) -> PylonResult<InstantCamera> {
+    pub fn create_device(&self, device_info: &DeviceInfo) -> PylonResult<InstantCamera<'a>> {
         let inner = ffi::tl_factory_create_device(&device_info.inner)?;
-        Ok(InstantCamera { inner })
+        Ok(InstantCamera { lib: self.lib, inner })
     }
     pub fn enumerate_devices(&self) -> PylonResult<Vec<DeviceInfo>> {
         let devs: cxx::UniquePtr<cxx::CxxVector<ffi::CDeviceInfo>> =
@@ -263,7 +265,9 @@ impl TlFactory {
 }
 
 /// Wrap the CInstantCamera type
-pub struct InstantCamera {
+pub struct InstantCamera<'a> {
+    #[allow(dead_code)]
+    lib: &'a Pylon,
     inner: cxx::UniquePtr<ffi::CInstantCamera>,
 }
 
@@ -387,9 +391,9 @@ pub trait NodeMap {
     fn command_node(&self, name: &str) -> PylonResult<CommandNode>;
 }
 
-unsafe impl Send for InstantCamera {}
+unsafe impl<'a> Send for InstantCamera<'a> {}
 
-impl NodeMap for InstantCamera {
+impl<'a> NodeMap for InstantCamera<'a> {
     fn boolean_node(&self, name: &str) -> PylonResult<BooleanNode> {
         let inner = ffi::node_map_get_boolean_parameter(&self.inner, name)?;
         Ok(BooleanNode { inner })
@@ -412,7 +416,7 @@ impl NodeMap for InstantCamera {
     }
 }
 
-impl InstantCamera {
+impl<'a> InstantCamera<'a> {
     pub fn device_info(&self) -> DeviceInfo {
         // According to InstantCamera.h, `GetDeviceInfo()` does not throw C++ exceptions.
         let di = ffi::instant_camera_get_device_info(&self.inner);
