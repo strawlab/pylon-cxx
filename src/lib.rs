@@ -242,15 +242,21 @@ pub struct TlFactory<'a> {
 
 impl<'a> TlFactory<'a> {
     pub fn instance(lib: &'a Pylon) -> Self {
-        Self {lib}
+        Self { lib }
     }
     pub fn create_first_device(&self) -> PylonResult<InstantCamera<'a>> {
         let inner = ffi::tl_factory_create_first_device()?;
-        Ok(InstantCamera { lib: self.lib, inner })
+        Ok(InstantCamera {
+            lib: self.lib,
+            inner,
+        })
     }
     pub fn create_device(&self, device_info: &DeviceInfo) -> PylonResult<InstantCamera<'a>> {
         let inner = ffi::tl_factory_create_device(&device_info.inner)?;
-        Ok(InstantCamera { lib: self.lib, inner })
+        Ok(InstantCamera {
+            lib: self.lib,
+            inner,
+        })
     }
     pub fn enumerate_devices(&self) -> PylonResult<Vec<DeviceInfo>> {
         let devs: cxx::UniquePtr<cxx::CxxVector<ffi::CDeviceInfo>> =
