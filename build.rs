@@ -1,6 +1,7 @@
 fn main() {
     println!("cargo:rerun-if-env-changed=PYLON_VERSION");
     println!("cargo:rerun-if-env-changed=PYLON_ROOT");
+    println!("cargo:rerun-if-env-changed=PYLON_DEV_DIR");
 
     let pylon_major_version: Option<u8> =
         std::env::var_os("PYLON_VERSION").map(|s| s.into_string().unwrap().parse::<u8>().unwrap());
@@ -189,10 +190,13 @@ fn main() {
     {
         use std::path::PathBuf;
 
-        let pylon_dev_dir = match pylon_major_version {
-            Some(5) => PathBuf::from(r#"C:\Program Files\Basler\pylon 5\Development"#),
-            Some(6) | None => PathBuf::from(r#"C:\Program Files\Basler\pylon 6\Development"#),
-            Some(version) => panic!("unsupported pylon version: {}", version),
+        let pylon_dev_dir = match std::env::var("PYLON_DEV_DIR") {
+            Ok(val) => PathBuf::from(val),
+            Err(_) => match pylon_major_version {
+                Some(5) => PathBuf::from(r#"C:\Program Files\Basler\pylon 5\Development"#),
+                Some(6) | None => PathBuf::from(r#"C:\Program Files\Basler\pylon 6\Development"#),
+                Some(version) => panic!("unsupported pylon version: {}", version),
+            },
         };
 
         let mut include_dir = pylon_dev_dir.clone();
