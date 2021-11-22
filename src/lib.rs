@@ -104,6 +104,19 @@ mod ffi {
             timeout_handling: TimeoutHandling,
         ) -> Result<bool>;
 
+        fn node_map_load(
+            camera: &UniquePtr<CInstantCamera>,
+            filename: String,
+            validate: bool,
+        ) -> Result<()>;
+        fn node_map_save(camera: &UniquePtr<CInstantCamera>, filename: String) -> Result<()>;
+        fn node_map_load_from_string(
+            camera: &UniquePtr<CInstantCamera>,
+            features: String,
+            validate: bool,
+        ) -> Result<()>;
+        fn node_map_save_to_string(camera: &UniquePtr<CInstantCamera>) -> Result<String>;
+
         fn node_map_get_boolean_parameter(
             camera: &UniquePtr<CInstantCamera>,
             name: &str,
@@ -390,6 +403,11 @@ impl CommandNode {
 }
 
 pub trait NodeMap {
+    fn load<P: AsRef<std::path::Path>>(&self, path: P, validate: bool) -> PylonResult<()>;
+    fn save<P: AsRef<std::path::Path>>(&self, path: P) -> PylonResult<()>;
+    fn load_from_string(&self, features: String, validate: bool) -> PylonResult<()>;
+    fn save_to_string(&self) -> PylonResult<String>;
+
     fn boolean_node(&self, name: &str) -> PylonResult<BooleanNode>;
     fn integer_node(&self, name: &str) -> PylonResult<IntegerNode>;
     fn float_node(&self, name: &str) -> PylonResult<FloatNode>;
@@ -400,6 +418,21 @@ pub trait NodeMap {
 unsafe impl<'a> Send for InstantCamera<'a> {}
 
 impl<'a> NodeMap for InstantCamera<'a> {
+    fn load<P: AsRef<std::path::Path>>(&self, path: P, validate: bool) -> PylonResult<()> {
+        let filename = path_to_string(path)?;
+        ffi::node_map_load(&self.inner, filename, validate).into_rust()
+    }
+    fn save<P: AsRef<std::path::Path>>(&self, path: P) -> PylonResult<()> {
+        let filename = path_to_string(path)?;
+        ffi::node_map_save(&self.inner, filename).into_rust()
+    }
+    fn load_from_string(&self, features: String, validate: bool) -> PylonResult<()> {
+        ffi::node_map_load_from_string(&self.inner, features, validate).into_rust()
+    }
+    fn save_to_string(&self) -> PylonResult<String> {
+        ffi::node_map_save_to_string(&self.inner).into_rust()
+    }
+
     fn boolean_node(&self, name: &str) -> PylonResult<BooleanNode> {
         let inner = ffi::node_map_get_boolean_parameter(&self.inner, name)?;
         Ok(BooleanNode { inner })
@@ -615,3 +648,14 @@ impl Clone for DeviceInfo {
 }
 
 unsafe impl Send for DeviceInfo {}
+
+fn path_to_string<P: AsRef<std::path::Path>>(path: P) -> PylonResult<String> {
+    match path.as_ref().to_str() {
+        Some(filename) => Ok(filename.into()),
+        None => Err(PylonError {
+            msg: "Cannot convert path to UTF-8".to_string(),
+            #[cfg(feature = "backtrace")]
+            backtrace: Backtrace::capture(),
+        }),
+    }
+}

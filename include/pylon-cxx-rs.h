@@ -18,6 +18,12 @@ namespace Pylon
     void instant_camera_open(const std::unique_ptr<CInstantCamera> &);
     bool instant_camera_is_open(const std::unique_ptr<CInstantCamera> &);
     void instant_camera_close(const std::unique_ptr<CInstantCamera> &);
+    void node_map_load(const std::unique_ptr<CInstantCamera> &, rust::String, bool);
+    void node_map_save(const std::unique_ptr<CInstantCamera> &, rust::String);
+
+    void node_map_load_from_string(const std::unique_ptr<CInstantCamera> &, rust::String, bool);
+    rust::String node_map_save_to_string(const std::unique_ptr<CInstantCamera> &);
+
     void instant_camera_start_grabbing(const std::unique_ptr<CInstantCamera> &);
     void instant_camera_start_grabbing_with_count(const std::unique_ptr<CInstantCamera> &, uint32_t);
     void instant_camera_stop_grabbing(const std::unique_ptr<CInstantCamera> &);

@@ -64,6 +64,31 @@ namespace Pylon
         camera->Close();
     }
 
+    void node_map_load(const std::unique_ptr<CInstantCamera> &camera, rust::String filename, bool validate)
+    {
+        const char *filename_c = filename.c_str();
+        CFeaturePersistence::Load(filename_c, &camera->GetNodeMap(), validate);
+    }
+
+    void node_map_save(const std::unique_ptr<CInstantCamera> &camera, rust::String filename)
+    {
+        const char *filename_c = filename.c_str();
+        CFeaturePersistence::Save(filename_c, &camera->GetNodeMap());
+    }
+
+    void node_map_load_from_string(const std::unique_ptr<CInstantCamera> &camera, rust::String features, bool validate)
+    {
+        const char *features_c = features.c_str();
+        CFeaturePersistence::LoadFromString(features_c, &camera->GetNodeMap(), validate);
+    }
+
+    rust::String node_map_save_to_string(const std::unique_ptr<CInstantCamera> &camera)
+    {
+        Pylon::String_t result;
+        CFeaturePersistence::SaveToString(result, &camera->GetNodeMap());
+        return rust::String(result.c_str(), result.length());
+    }
+
     void instant_camera_start_grabbing(const std::unique_ptr<CInstantCamera> &camera)
     {
         camera->StartGrabbing();
