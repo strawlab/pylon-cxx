@@ -70,6 +70,8 @@ mod ffi {
         type CEnumParameter;
         type CCommandParameter;
 
+        type MyNodeMap;
+
         fn PylonInitialize();
         fn PylonTerminate(ShutDownLogging: bool);
         unsafe fn GetPylonVersion(
@@ -104,38 +106,46 @@ mod ffi {
             timeout_handling: TimeoutHandling,
         ) -> Result<bool>;
 
-        fn node_map_load(
+        fn instant_camera_get_node_map(camera: &UniquePtr<CInstantCamera>) -> &MyNodeMap;
+        fn instant_camera_get_tl_node_map(camera: &UniquePtr<CInstantCamera>) -> &MyNodeMap;
+        fn instant_camera_get_stream_grabber_node_map(
             camera: &UniquePtr<CInstantCamera>,
-            filename: String,
-            validate: bool,
-        ) -> Result<()>;
-        fn node_map_save(camera: &UniquePtr<CInstantCamera>, filename: String) -> Result<()>;
+        ) -> &MyNodeMap;
+        fn instant_camera_get_event_grabber_node_map(
+            camera: &UniquePtr<CInstantCamera>,
+        ) -> &MyNodeMap;
+        fn instant_camera_get_instant_camera_node_map(
+            camera: &UniquePtr<CInstantCamera>,
+        ) -> &MyNodeMap;
+
+        fn node_map_load(node_map: &MyNodeMap, filename: String, validate: bool) -> Result<()>;
+        fn node_map_save(node_map: &MyNodeMap, filename: String) -> Result<()>;
         fn node_map_load_from_string(
-            camera: &UniquePtr<CInstantCamera>,
+            node_map: &MyNodeMap,
             features: String,
             validate: bool,
         ) -> Result<()>;
-        fn node_map_save_to_string(camera: &UniquePtr<CInstantCamera>) -> Result<String>;
+        fn node_map_save_to_string(node_map: &MyNodeMap) -> Result<String>;
 
         fn node_map_get_boolean_parameter(
-            camera: &UniquePtr<CInstantCamera>,
+            node_map: &MyNodeMap,
             name: &str,
         ) -> Result<UniquePtr<CBooleanParameter>>;
         fn node_map_get_integer_parameter(
-            camera: &UniquePtr<CInstantCamera>,
+            node_map: &MyNodeMap,
             name: &str,
         ) -> Result<UniquePtr<CIntegerParameter>>;
         fn node_map_get_float_parameter(
-            camera: &UniquePtr<CInstantCamera>,
+            node_map: &MyNodeMap,
             name: &str,
         ) -> Result<UniquePtr<CFloatParameter>>;
         fn node_map_get_enum_parameter(
-            camera: &UniquePtr<CInstantCamera>,
+            node_map: &MyNodeMap,
             name: &str,
         ) -> Result<UniquePtr<CEnumParameter>>;
 
         fn node_map_get_command_parameter(
-            camera: &UniquePtr<CInstantCamera>,
+            node_map: &MyNodeMap,
             name: &str,
         ) -> Result<UniquePtr<CCommandParameter>>;
 
@@ -290,6 +300,62 @@ pub struct InstantCamera<'a> {
     inner: cxx::UniquePtr<ffi::CInstantCamera>,
 }
 
+/// Wrap the `GenApi::INodeMap` type.
+///
+/// This provides access to the various nodes (boolean, integer, float, enum,
+/// and command nodes). Also allows loading all node values from and saving all
+/// values to either a file or a [String].
+///
+/// The `'parent` lifetime refers to the object, such as an [`InstantCamera`],
+/// from which the node map is generated. The reference to the nodemap itself
+/// has the `'map` lifetime. The `'parent` lifetime lives at least as long as
+/// the `'map` lifetime.
+pub struct NodeMap<'map, 'parent: 'map> {
+    inner: &'map ffi::MyNodeMap,
+    parent: std::marker::PhantomData<&'parent u8>,
+}
+
+impl<'map, 'parent: 'map> NodeMap<'map, 'parent> {
+    /// Load all values from the file at `path` into the nodemap.
+    pub fn load<P: AsRef<std::path::Path>>(&self, path: P, validate: bool) -> PylonResult<()> {
+        let filename = path_to_string(path)?;
+        ffi::node_map_load(self.inner, filename, validate).into_rust()
+    }
+    /// Save all values to file at `path` from the nodemap.
+    pub fn save<P: AsRef<std::path::Path>>(&self, path: P) -> PylonResult<()> {
+        let filename = path_to_string(path)?;
+        ffi::node_map_save(self.inner, filename).into_rust()
+    }
+    /// Load all values from the `features` string into the nodemap.
+    pub fn load_from_string(&self, features: String, validate: bool) -> PylonResult<()> {
+        ffi::node_map_load_from_string(self.inner, features, validate).into_rust()
+    }
+    /// Save all values to [String] from the nodemap.
+    pub fn save_to_string(&self) -> PylonResult<String> {
+        ffi::node_map_save_to_string(self.inner).into_rust()
+    }
+    pub fn boolean_node(&self, name: &str) -> PylonResult<BooleanNode> {
+        let inner = ffi::node_map_get_boolean_parameter(self.inner, name)?;
+        Ok(BooleanNode { inner })
+    }
+    pub fn integer_node(&self, name: &str) -> PylonResult<IntegerNode> {
+        let inner = ffi::node_map_get_integer_parameter(self.inner, name)?;
+        Ok(IntegerNode { inner })
+    }
+    pub fn float_node(&self, name: &str) -> PylonResult<FloatNode> {
+        let inner = ffi::node_map_get_float_parameter(self.inner, name)?;
+        Ok(FloatNode { inner })
+    }
+    pub fn enum_node(&self, name: &str) -> PylonResult<EnumNode> {
+        let inner = ffi::node_map_get_enum_parameter(self.inner, name)?;
+        Ok(EnumNode { inner })
+    }
+    pub fn command_node(&self, name: &str) -> PylonResult<CommandNode> {
+        let inner = ffi::node_map_get_command_parameter(self.inner, name)?;
+        Ok(CommandNode { inner })
+    }
+}
+
 /// Options passed to `start_grabbing`.
 pub struct GrabOptions {
     count: Option<u32>,
@@ -402,58 +468,7 @@ impl CommandNode {
     }
 }
 
-pub trait NodeMap {
-    fn load<P: AsRef<std::path::Path>>(&self, path: P, validate: bool) -> PylonResult<()>;
-    fn save<P: AsRef<std::path::Path>>(&self, path: P) -> PylonResult<()>;
-    fn load_from_string(&self, features: String, validate: bool) -> PylonResult<()>;
-    fn save_to_string(&self) -> PylonResult<String>;
-
-    fn boolean_node(&self, name: &str) -> PylonResult<BooleanNode>;
-    fn integer_node(&self, name: &str) -> PylonResult<IntegerNode>;
-    fn float_node(&self, name: &str) -> PylonResult<FloatNode>;
-    fn enum_node(&self, name: &str) -> PylonResult<EnumNode>;
-    fn command_node(&self, name: &str) -> PylonResult<CommandNode>;
-}
-
 unsafe impl<'a> Send for InstantCamera<'a> {}
-
-impl<'a> NodeMap for InstantCamera<'a> {
-    fn load<P: AsRef<std::path::Path>>(&self, path: P, validate: bool) -> PylonResult<()> {
-        let filename = path_to_string(path)?;
-        ffi::node_map_load(&self.inner, filename, validate).into_rust()
-    }
-    fn save<P: AsRef<std::path::Path>>(&self, path: P) -> PylonResult<()> {
-        let filename = path_to_string(path)?;
-        ffi::node_map_save(&self.inner, filename).into_rust()
-    }
-    fn load_from_string(&self, features: String, validate: bool) -> PylonResult<()> {
-        ffi::node_map_load_from_string(&self.inner, features, validate).into_rust()
-    }
-    fn save_to_string(&self) -> PylonResult<String> {
-        ffi::node_map_save_to_string(&self.inner).into_rust()
-    }
-
-    fn boolean_node(&self, name: &str) -> PylonResult<BooleanNode> {
-        let inner = ffi::node_map_get_boolean_parameter(&self.inner, name)?;
-        Ok(BooleanNode { inner })
-    }
-    fn integer_node(&self, name: &str) -> PylonResult<IntegerNode> {
-        let inner = ffi::node_map_get_integer_parameter(&self.inner, name)?;
-        Ok(IntegerNode { inner })
-    }
-    fn float_node(&self, name: &str) -> PylonResult<FloatNode> {
-        let inner = ffi::node_map_get_float_parameter(&self.inner, name)?;
-        Ok(FloatNode { inner })
-    }
-    fn enum_node(&self, name: &str) -> PylonResult<EnumNode> {
-        let inner = ffi::node_map_get_enum_parameter(&self.inner, name)?;
-        Ok(EnumNode { inner })
-    }
-    fn command_node(&self, name: &str) -> PylonResult<CommandNode> {
-        let inner = ffi::node_map_get_command_parameter(&self.inner, name)?;
-        Ok(CommandNode { inner })
-    }
-}
 
 impl<'a> InstantCamera<'a> {
     pub fn device_info(&self) -> DeviceInfo {
@@ -505,6 +520,40 @@ impl<'a> InstantCamera<'a> {
             timeout_handling,
         )
         .into_rust()
+    }
+}
+
+/// These methods return the various node maps.
+impl<'a> InstantCamera<'a> {
+    pub fn node_map<'map>(&'a self) -> NodeMap<'map, 'a> {
+        NodeMap {
+            inner: ffi::instant_camera_get_node_map(&self.inner),
+            parent: std::marker::PhantomData,
+        }
+    }
+    pub fn tl_node_map<'map>(&'a self) -> NodeMap<'map, 'a> {
+        NodeMap {
+            inner: ffi::instant_camera_get_tl_node_map(&self.inner),
+            parent: std::marker::PhantomData,
+        }
+    }
+    pub fn stream_grabber_node_map<'map>(&'a self) -> NodeMap<'map, 'a> {
+        NodeMap {
+            inner: ffi::instant_camera_get_stream_grabber_node_map(&self.inner),
+            parent: std::marker::PhantomData,
+        }
+    }
+    pub fn event_grabber_node_map<'map>(&'a self) -> NodeMap<'map, 'a> {
+        NodeMap {
+            inner: ffi::instant_camera_get_event_grabber_node_map(&self.inner),
+            parent: std::marker::PhantomData,
+        }
+    }
+    pub fn instant_camera_node_map<'map>(&'a self) -> NodeMap<'map, 'a> {
+        NodeMap {
+            inner: ffi::instant_camera_get_instant_camera_node_map(&self.inner),
+            parent: std::marker::PhantomData,
+        }
     }
 }
 

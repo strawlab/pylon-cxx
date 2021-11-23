@@ -4,6 +4,10 @@
 namespace Pylon
 {
 
+    // Due to interaction with CXX and namespaces, I had to put this definition
+    // inside the Pylon namespace. Probably there is a better way.
+    using MyNodeMap = GenApi::INodeMap;
+
     enum TimeoutHandling
     {
         Return,
@@ -18,11 +22,18 @@ namespace Pylon
     void instant_camera_open(const std::unique_ptr<CInstantCamera> &);
     bool instant_camera_is_open(const std::unique_ptr<CInstantCamera> &);
     void instant_camera_close(const std::unique_ptr<CInstantCamera> &);
-    void node_map_load(const std::unique_ptr<CInstantCamera> &, rust::String, bool);
-    void node_map_save(const std::unique_ptr<CInstantCamera> &, rust::String);
 
-    void node_map_load_from_string(const std::unique_ptr<CInstantCamera> &, rust::String, bool);
-    rust::String node_map_save_to_string(const std::unique_ptr<CInstantCamera> &);
+    const MyNodeMap& instant_camera_get_node_map(const std::unique_ptr<CInstantCamera> &);
+    const MyNodeMap& instant_camera_get_tl_node_map(const std::unique_ptr<CInstantCamera> &);
+    const MyNodeMap& instant_camera_get_stream_grabber_node_map(const std::unique_ptr<CInstantCamera> &);
+    const MyNodeMap& instant_camera_get_event_grabber_node_map(const std::unique_ptr<CInstantCamera> &);
+    const MyNodeMap& instant_camera_get_instant_camera_node_map(const std::unique_ptr<CInstantCamera> &);
+
+    void node_map_load(const MyNodeMap&, rust::String, bool);
+    void node_map_save(const MyNodeMap&, rust::String);
+
+    void node_map_load_from_string(const MyNodeMap&, rust::String, bool);
+    rust::String node_map_save_to_string(const MyNodeMap&);
 
     void instant_camera_start_grabbing(const std::unique_ptr<CInstantCamera> &);
     void instant_camera_start_grabbing_with_count(const std::unique_ptr<CInstantCamera> &, uint32_t);
@@ -31,11 +42,11 @@ namespace Pylon
 
     bool instant_camera_retrieve_result(const std::unique_ptr<CInstantCamera> &, uint32_t, std::unique_ptr<CGrabResultPtr> &, TimeoutHandling);
 
-    std::unique_ptr<CBooleanParameter> node_map_get_boolean_parameter(const std::unique_ptr<CInstantCamera> &, rust::Str);
-    std::unique_ptr<CIntegerParameter> node_map_get_integer_parameter(const std::unique_ptr<CInstantCamera> &, rust::Str);
-    std::unique_ptr<CFloatParameter> node_map_get_float_parameter(const std::unique_ptr<CInstantCamera> &, rust::Str);
-    std::unique_ptr<CEnumParameter> node_map_get_enum_parameter(const std::unique_ptr<CInstantCamera> &, rust::Str);
-    std::unique_ptr<CCommandParameter> node_map_get_command_parameter(const std::unique_ptr<CInstantCamera> &, rust::Str);
+    std::unique_ptr<CBooleanParameter> node_map_get_boolean_parameter(const MyNodeMap&, rust::Str);
+    std::unique_ptr<CIntegerParameter> node_map_get_integer_parameter(const MyNodeMap&, rust::Str);
+    std::unique_ptr<CFloatParameter> node_map_get_float_parameter(const MyNodeMap&, rust::Str);
+    std::unique_ptr<CEnumParameter> node_map_get_enum_parameter(const MyNodeMap&, rust::Str);
+    std::unique_ptr<CCommandParameter> node_map_get_command_parameter(const MyNodeMap&, rust::Str);
 
     bool boolean_node_get_value(const std::unique_ptr<CBooleanParameter> &);
     void boolean_node_set_value(const std::unique_ptr<CBooleanParameter> &, bool);

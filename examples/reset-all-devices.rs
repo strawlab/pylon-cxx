@@ -1,4 +1,4 @@
-use pylon_cxx::{HasProperties, NodeMap};
+use pylon_cxx::HasProperties;
 
 fn main() -> anyhow::Result<()> {
     // Before using any pylon methods, the pylon runtime must be initialized.
@@ -16,7 +16,7 @@ fn main() -> anyhow::Result<()> {
         camera.open()?;
 
         {
-            let node = camera.command_node("DeviceReset")?;
+            let node = camera.node_map().command_node("DeviceReset")?;
             print!("  resetting...");
             node.execute(true)?;
             println!("OK");

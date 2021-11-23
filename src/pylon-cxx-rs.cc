@@ -64,28 +64,57 @@ namespace Pylon
         camera->Close();
     }
 
-    void node_map_load(const std::unique_ptr<CInstantCamera> &camera, rust::String filename, bool validate)
+    const MyNodeMap& instant_camera_get_node_map(const std::unique_ptr<CInstantCamera> &camera)
     {
-        const char *filename_c = filename.c_str();
-        CFeaturePersistence::Load(filename_c, &camera->GetNodeMap(), validate);
+        return camera->GetNodeMap();
     }
 
-    void node_map_save(const std::unique_ptr<CInstantCamera> &camera, rust::String filename)
+    const MyNodeMap& instant_camera_get_tl_node_map(const std::unique_ptr<CInstantCamera> &camera)
     {
-        const char *filename_c = filename.c_str();
-        CFeaturePersistence::Save(filename_c, &camera->GetNodeMap());
+        return camera->GetTLNodeMap();
     }
 
-    void node_map_load_from_string(const std::unique_ptr<CInstantCamera> &camera, rust::String features, bool validate)
+    const MyNodeMap& instant_camera_get_stream_grabber_node_map(const std::unique_ptr<CInstantCamera> &camera)
     {
+        return camera->GetStreamGrabberNodeMap();
+    }
+
+    const MyNodeMap& instant_camera_get_event_grabber_node_map(const std::unique_ptr<CInstantCamera> &camera)
+    {
+        return camera->GetEventGrabberNodeMap();
+    }
+
+    const MyNodeMap& instant_camera_get_instant_camera_node_map(const std::unique_ptr<CInstantCamera> &camera)
+    {
+        return camera->GetInstantCameraNodeMap();
+    }
+
+    void node_map_load(const MyNodeMap& node_map, rust::String filename, bool validate)
+    {
+        GenApi::INodeMap& nodemap = (GenApi::INodeMap&)node_map;
+        const char *filename_c = filename.c_str();
+        CFeaturePersistence::Load(filename_c, &nodemap, validate);
+    }
+
+    void node_map_save(const MyNodeMap& node_map, rust::String filename)
+    {
+        GenApi::INodeMap& nodemap = (GenApi::INodeMap&)node_map;
+        const char *filename_c = filename.c_str();
+        CFeaturePersistence::Save(filename_c, &nodemap);
+    }
+
+    void node_map_load_from_string(const MyNodeMap& node_map, rust::String features, bool validate)
+    {
+        GenApi::INodeMap& nodemap = (GenApi::INodeMap&)node_map;
         const char *features_c = features.c_str();
-        CFeaturePersistence::LoadFromString(features_c, &camera->GetNodeMap(), validate);
+        CFeaturePersistence::LoadFromString(features_c, &nodemap, validate);
     }
 
-    rust::String node_map_save_to_string(const std::unique_ptr<CInstantCamera> &camera)
+    rust::String node_map_save_to_string(const MyNodeMap& node_map)
     {
+        GenApi::INodeMap& nodemap = (GenApi::INodeMap&)node_map;
         Pylon::String_t result;
-        CFeaturePersistence::SaveToString(result, &camera->GetNodeMap());
+        CFeaturePersistence::SaveToString(result, &nodemap);
         return rust::String(result.c_str(), result.length());
     }
 
@@ -129,37 +158,37 @@ namespace Pylon
         return camera->RetrieveResult(timeout, *result, eth);
     }
 
-    std::unique_ptr<CBooleanParameter> node_map_get_boolean_parameter(const std::unique_ptr<CInstantCamera> &camera, rust::Str c_name)
+    std::unique_ptr<CBooleanParameter> node_map_get_boolean_parameter(const MyNodeMap& node_map, rust::Str c_name)
     {
-        GenApi::INodeMap &nodemap = camera->GetNodeMap();
+        GenApi::INodeMap& nodemap = (GenApi::INodeMap&)node_map;
         Pylon::String_t name = Pylon::String_t(c_name.data(), c_name.length());
         return std::make_unique<CBooleanParameter>(CBooleanParameter(nodemap, name));
     }
 
-    std::unique_ptr<CIntegerParameter> node_map_get_integer_parameter(const std::unique_ptr<CInstantCamera> &camera, rust::Str c_name)
+    std::unique_ptr<CIntegerParameter> node_map_get_integer_parameter(const MyNodeMap& node_map, rust::Str c_name)
     {
-        GenApi::INodeMap &nodemap = camera->GetNodeMap();
+        GenApi::INodeMap& nodemap = (GenApi::INodeMap&)node_map;
         Pylon::String_t name = Pylon::String_t(c_name.data(), c_name.length());
         return std::make_unique<CIntegerParameter>(CIntegerParameter(nodemap, name));
     }
 
-    std::unique_ptr<CFloatParameter> node_map_get_float_parameter(const std::unique_ptr<CInstantCamera> &camera, rust::Str c_name)
+    std::unique_ptr<CFloatParameter> node_map_get_float_parameter(const MyNodeMap& node_map, rust::Str c_name)
     {
-        GenApi::INodeMap &nodemap = camera->GetNodeMap();
+        GenApi::INodeMap& nodemap = (GenApi::INodeMap&)node_map;
         Pylon::String_t name = Pylon::String_t(c_name.data(), c_name.length());
         return std::make_unique<CFloatParameter>(CFloatParameter(nodemap, name));
     }
 
-    std::unique_ptr<CEnumParameter> node_map_get_enum_parameter(const std::unique_ptr<CInstantCamera> &camera, rust::Str c_name)
+    std::unique_ptr<CEnumParameter> node_map_get_enum_parameter(const MyNodeMap& node_map, rust::Str c_name)
     {
-        GenApi::INodeMap &nodemap = camera->GetNodeMap();
+        GenApi::INodeMap& nodemap = (GenApi::INodeMap&)node_map;
         Pylon::String_t name = Pylon::String_t(c_name.data(), c_name.length());
         return std::make_unique<CEnumParameter>(CEnumParameter(nodemap, name));
     }
 
-    std::unique_ptr<CCommandParameter> node_map_get_command_parameter(const std::unique_ptr<CInstantCamera> &camera, rust::Str c_name)
+    std::unique_ptr<CCommandParameter> node_map_get_command_parameter(const MyNodeMap& node_map, rust::Str c_name)
     {
-        GenApi::INodeMap &nodemap = camera->GetNodeMap();
+        GenApi::INodeMap& nodemap = (GenApi::INodeMap&)node_map;
         Pylon::String_t name = Pylon::String_t(c_name.data(), c_name.length());
         return std::make_unique<CCommandParameter>(CCommandParameter(nodemap, name));
     }

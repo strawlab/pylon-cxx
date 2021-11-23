@@ -1,5 +1,3 @@
-use pylon_cxx::NodeMap;
-
 const COUNT_IMAGES_TO_GRAB: u32 = 100;
 
 fn main() -> anyhow::Result<()> {
@@ -21,7 +19,7 @@ fn main() -> anyhow::Result<()> {
     // sets up free-running continuous acquisition.
     camera.start_grabbing(&pylon_cxx::GrabOptions::default().count(COUNT_IMAGES_TO_GRAB))?;
 
-    match camera.enum_node("PixelFormat") {
+    match camera.node_map().enum_node("PixelFormat") {
         Ok(node) => println!(
             "pixel format: {}",
             node.value().unwrap_or("could not read value".to_string())

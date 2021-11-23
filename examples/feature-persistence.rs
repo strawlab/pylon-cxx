@@ -13,10 +13,10 @@ fn main() -> anyhow::Result<()> {
     let filename = "NodeMap.pfs";
 
     println!("Saving camera's node map to file \"{}\".", filename);
-    pylon_cxx::NodeMap::save(&camera, filename)?;
+    camera.node_map().save(filename)?;
 
     println!("Reading file back to camera's node map.");
-    pylon_cxx::NodeMap::load(&camera, filename, true)?;
+    camera.node_map().load(filename, true)?;
 
     println!("Ok.");
     Ok(())

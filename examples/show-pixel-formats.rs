@@ -1,5 +1,3 @@
-use pylon_cxx::NodeMap;
-
 fn main() -> anyhow::Result<()> {
     // Before using any pylon methods, the pylon runtime must be initialized.
     let pylon = pylon_cxx::Pylon::new();
@@ -9,7 +7,7 @@ fn main() -> anyhow::Result<()> {
 
     camera.open()?;
 
-    let pixel_format_node = camera.enum_node("PixelFormat")?;
+    let pixel_format_node = camera.node_map().enum_node("PixelFormat")?;
     for v in pixel_format_node.settable_values()? {
         println!("{}", v);
     }
