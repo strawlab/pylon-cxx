@@ -43,7 +43,7 @@ impl std::error::Error for PylonError {
     }
 }
 
-type PylonResult<T> = Result<T, PylonError>;
+pub type PylonResult<T> = Result<T, PylonError>;
 
 #[cxx::bridge(namespace = Pylon)]
 mod ffi {
