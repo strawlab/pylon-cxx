@@ -335,24 +335,29 @@ impl<'map, 'parent: 'map> NodeMap<'map, 'parent> {
         ffi::node_map_save_to_string(self.inner).into_rust()
     }
     pub fn boolean_node(&self, name: &str) -> PylonResult<BooleanNode> {
-        let inner = ffi::node_map_get_boolean_parameter(self.inner, name)?;
-        Ok(BooleanNode { inner })
+        let name = name.to_string();
+        let inner = ffi::node_map_get_boolean_parameter(self.inner, &name)?;
+        Ok(BooleanNode { name, inner })
     }
     pub fn integer_node(&self, name: &str) -> PylonResult<IntegerNode> {
-        let inner = ffi::node_map_get_integer_parameter(self.inner, name)?;
-        Ok(IntegerNode { inner })
+        let name = name.to_string();
+        let inner = ffi::node_map_get_integer_parameter(self.inner, &name)?;
+        Ok(IntegerNode { name, inner })
     }
     pub fn float_node(&self, name: &str) -> PylonResult<FloatNode> {
-        let inner = ffi::node_map_get_float_parameter(self.inner, name)?;
-        Ok(FloatNode { inner })
+        let name = name.to_string();
+        let inner = ffi::node_map_get_float_parameter(self.inner, &name)?;
+        Ok(FloatNode { name, inner })
     }
     pub fn enum_node(&self, name: &str) -> PylonResult<EnumNode> {
-        let inner = ffi::node_map_get_enum_parameter(self.inner, name)?;
-        Ok(EnumNode { inner })
+        let name = name.to_string();
+        let inner = ffi::node_map_get_enum_parameter(self.inner, &name)?;
+        Ok(EnumNode { name, inner })
     }
     pub fn command_node(&self, name: &str) -> PylonResult<CommandNode> {
-        let inner = ffi::node_map_get_command_parameter(self.inner, name)?;
-        Ok(CommandNode { inner })
+        let name = name.to_string();
+        let inner = ffi::node_map_get_command_parameter(self.inner, &name)?;
+        Ok(CommandNode { name, inner })
     }
 }
 
@@ -374,10 +379,14 @@ impl GrabOptions {
 }
 
 pub struct BooleanNode {
+    name: String,
     inner: cxx::UniquePtr<ffi::CBooleanParameter>,
 }
 
 impl BooleanNode {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
     pub fn value(&self) -> PylonResult<bool> {
         ffi::boolean_node_get_value(&self.inner).into_rust()
     }
@@ -388,10 +397,14 @@ impl BooleanNode {
 }
 
 pub struct IntegerNode {
+    name: String,
     inner: cxx::UniquePtr<ffi::CIntegerParameter>,
 }
 
 impl IntegerNode {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
     pub fn unit(&self) -> PylonResult<String> {
         let cstr = ffi::integer_node_get_unit(&self.inner)?;
         Ok(cstr.to_str()?.to_string())
@@ -415,10 +428,14 @@ impl IntegerNode {
 }
 
 pub struct FloatNode {
+    name: String,
     inner: cxx::UniquePtr<ffi::CFloatParameter>,
 }
 
 impl FloatNode {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
     pub fn unit(&self) -> PylonResult<String> {
         let cstr = ffi::float_node_get_unit(&self.inner)?;
         Ok(cstr.to_str()?.to_string())
@@ -442,10 +459,14 @@ impl FloatNode {
 }
 
 pub struct EnumNode {
+    name: String,
     inner: cxx::UniquePtr<ffi::CEnumParameter>,
 }
 
 impl EnumNode {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
     pub fn value(&self) -> PylonResult<String> {
         let cstr = ffi::enum_node_get_value(&self.inner)?;
         Ok(cstr.to_str()?.to_string())
@@ -459,10 +480,14 @@ impl EnumNode {
 }
 
 pub struct CommandNode {
+    name: String,
     inner: cxx::UniquePtr<ffi::CCommandParameter>,
 }
 
 impl CommandNode {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
     pub fn execute(&self, verify: bool) -> PylonResult<()> {
         ffi::command_node_execute(&self.inner, verify).into_rust()
     }
