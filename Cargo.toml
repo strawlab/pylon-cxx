@@ -11,6 +11,8 @@ categories = ["api-bindings", "external-ffi-bindings", "hardware-support", "mult
 
 [dependencies]
 cxx = "1.0"
+tokio = {version = "1", features = ["rt", "macros", "net"], optional=true }
+tokio-stream = { version = "0.1.8", optional = true }
 
 [build-dependencies]
 cxx-build = "1.0"
@@ -20,3 +22,4 @@ anyhow = "1"
 
 [features]
 backtrace = []
+stream = ["tokio", "tokio-stream"]

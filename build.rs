@@ -52,7 +52,7 @@ fn main() {
 
         build.flag("-std=c++14").include(&include1);
 
-        let mut lib_dir = pylon_root.clone();
+        let mut lib_dir = pylon_root;
         if pylon_major_version == 5 {
             lib_dir.push("lib64");
         } else {
