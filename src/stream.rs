@@ -82,7 +82,7 @@ mod tests {
         for _ in 0..50 {
             let (id, res) = streams.next().await.unwrap();
             assert!(res.grab_succeeded()?);
-            println!("Cam: {id:?}");
+            println!("Cam: {:?}", id);
         }
 
         Ok(())
