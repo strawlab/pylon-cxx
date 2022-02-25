@@ -19,6 +19,9 @@ fn main() {
         .cpp(true)
         .include("include".to_string());
 
+    #[cfg(feature = "stream")]
+    build.define("FEATURE_STREAM", None);
+
     #[cfg(target_os = "linux")]
     {
         let pylon_root = match std::env::var("PYLON_ROOT") {
