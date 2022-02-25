@@ -23,3 +23,8 @@ anyhow = "1"
 [features]
 backtrace = []
 stream = ["tokio", "tokio-stream"]
+stream-app = ["stream", "tokio/rt-multi-thread"]
+
+[[example]]
+name = "async-grab"
+required-features = ["stream-app"]
