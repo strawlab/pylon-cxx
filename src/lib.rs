@@ -537,7 +537,9 @@ impl<'a> InstantCamera<'a> {
         // we assign the waitobject fd here for using it in the stream to poll for progress
         #[cfg(feature = "stream")]
         {
-            self.fd = Some(tokio::io::unix::AsyncFd::new(self.get_grab_result_fd()?)?);
+            if tokio::runtime::Handle::try_current().is_ok() {
+                self.fd = Some(tokio::io::unix::AsyncFd::new(self.get_grab_result_fd()?)?);
+            }
         }
 
         match options.count {
