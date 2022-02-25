@@ -112,9 +112,7 @@ mod ffi {
         ) -> Result<()>;
         fn instant_camera_is_grabbing(camera: &UniquePtr<CInstantCamera>) -> bool;
         #[cfg(feature = "stream")]
-        fn instant_camera_wait_object_fd(
-            camera: &UniquePtr<CInstantCamera>,
-        ) -> i32;
+        fn instant_camera_wait_object_fd(camera: &UniquePtr<CInstantCamera>) -> i32;
         fn instant_camera_retrieve_result(
             camera: &UniquePtr<CInstantCamera>,
             timeout_ms: u32,
@@ -509,14 +507,13 @@ unsafe impl<'a> Send for InstantCamera<'a> {}
 
 impl<'a> InstantCamera<'a> {
     pub fn new(lib: &'a Pylon, inner: cxx::UniquePtr<ffi::CInstantCamera>) -> Self {
-        InstantCamera { 
-            lib, 
+        InstantCamera {
+            lib,
             inner,
             #[cfg(feature = "stream")]
-            fd: None
+            fd: None,
         }
     }
-
 
     pub fn device_info(&self) -> DeviceInfo {
         // According to InstantCamera.h, `GetDeviceInfo()` does not throw C++ exceptions.

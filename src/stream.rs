@@ -44,7 +44,7 @@ impl<'a> Stream for InstantCamera<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{GrabOptions,Pylon, PylonError, PylonResult, TlFactory};
+    use crate::{GrabOptions, Pylon, PylonError, PylonResult, TlFactory};
     use tokio_stream::{StreamExt, StreamMap};
 
     #[tokio::test]
