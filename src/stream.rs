@@ -18,7 +18,7 @@ impl<'a> Stream for InstantCamera<'a> {
         match self
             .fd
             .as_ref()
-            .expect("When grabbing, a FD should always be there bc. it's set in start_grabbing")
+            .expect("No waitobject fd present (during start_grabbing, no tokio handler was available).")
             .poll_read_ready(cx)
         {
             Poll::Ready(Ok(mut g)) => {
