@@ -8,6 +8,11 @@ Rust wrapper of the Pylon libraries for Basler cameras using [CXX](https://crate
 
 Windows, linux, and macOS are all tested.
 
+## async stream with tokio
+
+Enable async stream support using tokio with the cargo feature `stream`. This
+feature is currently not compatible with Windows (help wanted).
+
 ## Building
 
 This crate expects to find the Pylon developer kit at the usual install

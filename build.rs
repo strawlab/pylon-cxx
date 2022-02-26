@@ -19,6 +19,9 @@ fn main() {
         .cpp(true)
         .include("include".to_string());
 
+    #[cfg(feature = "stream")]
+    build.define("FEATURE_STREAM", None);
+
     #[cfg(target_os = "linux")]
     {
         let pylon_root = match std::env::var("PYLON_ROOT") {
@@ -52,7 +55,7 @@ fn main() {
 
         build.flag("-std=c++14").include(&include1);
 
-        let mut lib_dir = pylon_root.clone();
+        let mut lib_dir = pylon_root;
         if pylon_major_version == 5 {
             lib_dir.push("lib64");
         } else {

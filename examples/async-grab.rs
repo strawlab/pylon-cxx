@@ -1,6 +1,9 @@
+use tokio_stream::StreamExt;
+
 const COUNT_IMAGES_TO_GRAB: u32 = 100;
 
-fn main() -> anyhow::Result<()> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     // Before using any pylon methods, the pylon runtime must be initialized.
     let pylon = pylon_cxx::Pylon::new();
 
@@ -27,18 +30,14 @@ fn main() -> anyhow::Result<()> {
         Err(e) => eprintln!("Ignoring error getting PixelFormat node: {}", e),
     };
 
-    let mut grab_result = pylon_cxx::GrabResult::new()?;
+    tokio::pin!(camera);
 
-    // Camera.StopGrabbing() is called automatically by the RetrieveResult() method
-    // when c_countOfImagesToGrab images have been retrieved.
-    while camera.is_grabbing() {
-        // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
-        camera.retrieve_result(
-            5000,
-            &mut grab_result,
-            pylon_cxx::TimeoutHandling::ThrowException,
-        )?;
-
+    // The stream automatically stops when COUNT_IMAGES_TO_GRAB images have been grabbed .
+    //
+    // Note that getting the next image from the async stream, is awaited. Which means it's
+    // blocked here, but while waiting other async parts of your application may do useful
+    // work. That's the purpose of async-await.
+    while let Some(grab_result) = camera.next().await {
         // Image grabbed successfully?
         if grab_result.grab_succeeded()? {
             // Access the image data.

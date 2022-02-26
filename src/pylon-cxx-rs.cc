@@ -1,3 +1,7 @@
+#if defined(FEATURE_STREAM)
+#include <unistd.h>
+#include <fcntl.h>
+#endif
 #include <memory>
 #include "pylon/PylonIncludes.h"
 #include "pylon-cxx-rs.h"
@@ -138,6 +142,12 @@ namespace Pylon
         // According to InstantCamera.h, `IsGrabbing()` does not throw C++ exceptions.
         return camera->IsGrabbing();
     }
+
+    #if defined(FEATURE_STREAM)
+    int instant_camera_wait_object_fd(const std::unique_ptr<CInstantCamera> &camera) {
+      return camera->GetGrabResultWaitObject().GetFd();
+    }
+    #endif
 
     bool instant_camera_retrieve_result(const std::unique_ptr<CInstantCamera> &camera, uint32_t timeout, std::unique_ptr<CGrabResultPtr> &result, TimeoutHandling timeout_handling)
     {

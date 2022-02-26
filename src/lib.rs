@@ -3,6 +3,9 @@
 #[cfg(feature = "backtrace")]
 use std::backtrace::Backtrace;
 
+#[cfg(feature = "stream")]
+pub mod stream;
+
 #[derive(Debug)]
 pub struct PylonError {
     msg: String,
@@ -30,6 +33,16 @@ impl From<std::str::Utf8Error> for PylonError {
     }
 }
 
+impl From<std::io::Error> for PylonError {
+    fn from(orig: std::io::Error) -> PylonError {
+        PylonError {
+            msg: orig.to_string(),
+            #[cfg(feature = "backtrace")]
+            backtrace: Backtrace::capture(),
+        }
+    }
+}
+
 impl std::fmt::Display for PylonError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "PylonError({})", self.msg)
@@ -47,7 +60,6 @@ pub type PylonResult<T> = Result<T, PylonError>;
 
 #[cxx::bridge(namespace = Pylon)]
 mod ffi {
-
     #[repr(u32)]
     enum TimeoutHandling {
         Return,
@@ -99,6 +111,8 @@ mod ffi {
             count: u32,
         ) -> Result<()>;
         fn instant_camera_is_grabbing(camera: &UniquePtr<CInstantCamera>) -> bool;
+        #[cfg(feature = "stream")]
+        fn instant_camera_wait_object_fd(camera: &UniquePtr<CInstantCamera>) -> i32;
         fn instant_camera_retrieve_result(
             camera: &UniquePtr<CInstantCamera>,
             timeout_ms: u32,
@@ -269,17 +283,11 @@ impl<'a> TlFactory<'a> {
     }
     pub fn create_first_device(&self) -> PylonResult<InstantCamera<'a>> {
         let inner = ffi::tl_factory_create_first_device()?;
-        Ok(InstantCamera {
-            lib: self.lib,
-            inner,
-        })
+        Ok(InstantCamera::new(self.lib, inner))
     }
     pub fn create_device(&self, device_info: &DeviceInfo) -> PylonResult<InstantCamera<'a>> {
         let inner = ffi::tl_factory_create_device(&device_info.inner)?;
-        Ok(InstantCamera {
-            lib: self.lib,
-            inner,
-        })
+        Ok(InstantCamera::new(self.lib, inner))
     }
     pub fn enumerate_devices(&self) -> PylonResult<Vec<DeviceInfo>> {
         let devs: cxx::UniquePtr<cxx::CxxVector<ffi::CDeviceInfo>> =
@@ -298,6 +306,8 @@ pub struct InstantCamera<'a> {
     #[allow(dead_code)]
     lib: &'a Pylon,
     inner: cxx::UniquePtr<ffi::CInstantCamera>,
+    #[cfg(feature = "stream")]
+    fd: Option<tokio::io::unix::AsyncFd<std::os::unix::io::RawFd>>,
 }
 
 /// Wrap the `GenApi::INodeMap` type.
@@ -496,6 +506,15 @@ impl CommandNode {
 unsafe impl<'a> Send for InstantCamera<'a> {}
 
 impl<'a> InstantCamera<'a> {
+    pub fn new(lib: &'a Pylon, inner: cxx::UniquePtr<ffi::CInstantCamera>) -> Self {
+        InstantCamera {
+            lib,
+            inner,
+            #[cfg(feature = "stream")]
+            fd: None,
+        }
+    }
+
     pub fn device_info(&self) -> DeviceInfo {
         // According to InstantCamera.h, `GetDeviceInfo()` does not throw C++ exceptions.
         let di = ffi::instant_camera_get_device_info(&self.inner);
@@ -514,7 +533,15 @@ impl<'a> InstantCamera<'a> {
         ffi::instant_camera_close(&self.inner).into_rust()
     }
 
-    pub fn start_grabbing(&self, options: &GrabOptions) -> PylonResult<()> {
+    pub fn start_grabbing(&mut self, options: &GrabOptions) -> PylonResult<()> {
+        // we assign the waitobject fd here for using it in the stream to poll for progress
+        #[cfg(feature = "stream")]
+        {
+            if tokio::runtime::Handle::try_current().is_ok() {
+                self.fd = Some(tokio::io::unix::AsyncFd::new(self.get_grab_result_fd()?)?);
+            }
+        }
+
         match options.count {
             None => ffi::instant_camera_start_grabbing(&self.inner).into_rust(),
             Some(count) => {
@@ -545,6 +572,11 @@ impl<'a> InstantCamera<'a> {
             timeout_handling,
         )
         .into_rust()
+    }
+
+    #[cfg(feature = "stream")]
+    pub fn get_grab_result_fd(&self) -> PylonResult<std::os::unix::io::RawFd> {
+        Ok(ffi::instant_camera_wait_object_fd(&self.inner))
     }
 }
 

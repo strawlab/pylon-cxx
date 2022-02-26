@@ -40,6 +40,9 @@ namespace Pylon
     void instant_camera_stop_grabbing(const std::unique_ptr<CInstantCamera> &);
     bool instant_camera_is_grabbing(const std::unique_ptr<CInstantCamera> &);
 
+    #if defined(FEATURE_STREAM)
+    int instant_camera_wait_object_fd(const std::unique_ptr<CInstantCamera> &);
+    #endif
     bool instant_camera_retrieve_result(const std::unique_ptr<CInstantCamera> &, uint32_t, std::unique_ptr<CGrabResultPtr> &, TimeoutHandling);
 
     std::unique_ptr<CBooleanParameter> node_map_get_boolean_parameter(const MyNodeMap&, rust::Str);
