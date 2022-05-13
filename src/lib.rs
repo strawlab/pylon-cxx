@@ -6,6 +6,9 @@ use std::backtrace::Backtrace;
 #[cfg(feature = "stream")]
 pub mod stream;
 
+#[cfg(feature = "stream")]
+use std::cell::RefCell;
+
 #[derive(Debug)]
 pub struct PylonError {
     msg: String,
@@ -307,7 +310,7 @@ pub struct InstantCamera<'a> {
     lib: &'a Pylon,
     inner: cxx::UniquePtr<ffi::CInstantCamera>,
     #[cfg(feature = "stream")]
-    fd: Option<tokio::io::unix::AsyncFd<std::os::unix::io::RawFd>>,
+    fd: RefCell<Option<tokio::io::unix::AsyncFd<std::os::unix::io::RawFd>>>,
 }
 
 /// Wrap the `GenApi::INodeMap` type.
@@ -511,7 +514,7 @@ impl<'a> InstantCamera<'a> {
             lib,
             inner,
             #[cfg(feature = "stream")]
-            fd: None,
+            fd: RefCell::new(None),
         }
     }
 
@@ -533,12 +536,14 @@ impl<'a> InstantCamera<'a> {
         ffi::instant_camera_close(&self.inner).into_rust()
     }
 
-    pub fn start_grabbing(&mut self, options: &GrabOptions) -> PylonResult<()> {
+    pub fn start_grabbing(&self, options: &GrabOptions) -> PylonResult<()> {
         // we assign the waitobject fd here for using it in the stream to poll for progress
         #[cfg(feature = "stream")]
         {
             if tokio::runtime::Handle::try_current().is_ok() {
-                self.fd = Some(tokio::io::unix::AsyncFd::new(self.get_grab_result_fd()?)?);
+                self.fd.replace(Some(tokio::io::unix::AsyncFd::new(
+                    self.get_grab_result_fd()?,
+                )?));
             }
         }
 
