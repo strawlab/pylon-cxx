@@ -13,11 +13,11 @@ impl<'a> Stream for InstantCamera<'a> {
             return Poll::Ready(None);
         }
 
+        let fd = self.fd.borrow_mut();
+
         // poll the wait object fd for readyness and continue if ready, if not ready
         // poll_read_ready calls the ctx's waker if we can make progress
-        match self
-            .fd
-            .as_ref()
+        match fd.as_ref()
             .expect("No waitobject fd present (during start_grabbing, no tokio handler was available).")
             .poll_read_ready(cx)
         {
@@ -51,7 +51,7 @@ mod tests {
     async fn streaming_works() -> PylonResult<()> {
         let mut images = 10;
         let pylon = Pylon::new();
-        let mut cam = TlFactory::instance(&pylon).create_first_device()?;
+        let cam = TlFactory::instance(&pylon).create_first_device()?;
         cam.open()?;
         cam.start_grabbing(&GrabOptions::default().count(images))?;
         tokio::pin!(cam);
@@ -72,7 +72,7 @@ mod tests {
             .iter()
             .enumerate()
             .try_for_each(|(n, info)| {
-                let mut cam = TlFactory::instance(&pylon).create_device(info)?;
+                let cam = TlFactory::instance(&pylon).create_device(info)?;
                 cam.open()?;
                 cam.start_grabbing(&GrabOptions::default())?;
                 streams.insert(format!("{}-{}", info.model_name()?, n), Box::pin(cam));
