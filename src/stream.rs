@@ -15,10 +15,10 @@ impl<'a> Stream for InstantCamera<'a> {
 
         let fd = self.fd.borrow_mut();
 
-        // poll the wait object fd for readyness and continue if ready, if not ready
-        // poll_read_ready calls the ctx's waker if we can make progress
+        // poll the wait object fd for readiness and continue if ready, if not ready
+        // poll_read_ready calls the context's waker if we can make progress
         match fd.as_ref()
-            .expect("No waitobject fd present (during start_grabbing, no tokio handler was available).")
+            .expect("No wait object fd present (during start_grabbing, no tokio handler was available).")
             .poll_read_ready(cx)
         {
             Poll::Ready(Ok(mut g)) => {
