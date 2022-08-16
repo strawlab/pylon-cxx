@@ -42,19 +42,14 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - run: |
-          # Build and run example
-          cargo install fd-find
+      - run: cargo install fd-find
       - run: pip3 download pypylon==1.8.0
       - run: fd
       - run: unzip pypylon-*.whl
       - run: fd
       - name: build and run example
         run: |
-          # Build and run example
-          export PYLONFRAMEWORKDIR=`pwd`/pypylon
           cargo build --example grab
-          ln -s $PYLONFRAMEWORKDIR/pylon.framework target/debug/examples
-          PYLON_CAMEMU=2 target/debug/examples/grab
+          target/debug/examples/grab
         env:
           PYLON_DEV_DIR: pypylon
