@@ -176,6 +176,7 @@ fn main() {
             }
             Some(6) | None => {
                 // directory with `pylon.framework`
+                println!("cargo:rerun-if-env-changed=PYLONFRAMEWORKDIR");
                 let pylon_framework_dir = match std::env::var_os("PYLONFRAMEWORKDIR") {
                     Some(val) => std::path::PathBuf::from(val),
                     None => {
@@ -189,6 +190,8 @@ fn main() {
                     pylon_framework_dir.display()
                 );
                 println!("cargo:rustc-link-lib=framework=pylon");
+
+                // Look for pylon.framework in same dir as executable.
                 println!("cargo:rustc-link-arg=-Wl,-rpath,@loader_path");
 
                 let flag = format!("-F{}", pylon_framework_dir.display());
