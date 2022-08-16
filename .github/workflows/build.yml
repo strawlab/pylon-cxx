@@ -52,6 +52,7 @@ jobs:
           Copy-Item -Path pypylon/include/pylon/GenICam/* -Destination pypylon/include/ -Recurse
           Copy-Item -Path pypylon/include/pylon/GenICam/Base/* -Destination pypylon/include/ -Recurse
           New-Item pypylon/include/pylon/PylonBitmapImage.h
+          New-Item pypylon/include/pylon/AviWriter.h
       - run: fd
       - run: curl -O https://files.pythonhosted.org/packages/52/39/34150ebccecff69baabb9f437b7ac784870c9ca4804a050a5b6afc59c404/pypylon-1.8.0-cp310-cp310-win_amd64.whl
       # unzip '-o' means to overwrite.
