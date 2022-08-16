@@ -1,0 +1,35 @@
+name: Build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  build-macos-10-15:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - run: pip3 download pypylon==1.8.0
+      - run: unzip pypylon-*.whl
+      - run: |
+          cd pypylon/pylon.framework/Versions
+          # Create symlink: Current -> A/
+          ln -s A Current
+          cd ..
+          # Create symlinks: Headers -> Versions/Current/Headers/ and so on
+          ln -s Versions/Current/Headers
+          ln -s Versions/Current/Libraries
+          ln -s Versions/Current/Resources
+          cd ../..
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - run: |
+          # Build and run example
+          export PYLONFRAMEWORKDIR=`pwd`/pypylon
+          cargo build --example grab
+          ln -s $PYLONFRAMEWORKDIR/pylon.framework target/debug/examples
+          PYLON_CAMEMU=2 target/debug/examples/grab
