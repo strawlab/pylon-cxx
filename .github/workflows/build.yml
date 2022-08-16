@@ -43,7 +43,6 @@ jobs:
         with:
           toolchain: stable
       - run: cargo install fd-find
-      - run: pip3 download pypylon==1.8.0
       - run: fd
       - run: |
           curl -O https://files.pythonhosted.org/packages/af/76/ba5b7fc37b4151a27b5c0244b6f0b37bf34ecfeac771cd49807c7ceff848/pypylon-1.8.0-cp310-cp310-macosx_10_14_universal2.whl
@@ -51,7 +50,9 @@ jobs:
           mkdir pypylon/include
           Move-Item -Path pypylon/pylon.framework/Versions/A/Headers -Destination pypylon/include/pylon
       - run: fd
-      - run: unzip pypylon-*.whl
+      - run: curl -O https://files.pythonhosted.org/packages/52/39/34150ebccecff69baabb9f437b7ac784870c9ca4804a050a5b6afc59c404/pypylon-1.8.0-cp310-cp310-win_amd64.whl
+      - run: unzip pypylon-1.8.0-cp310-cp310-win_amd64.whl
+      - run: fd
       - run: |
           mkdir pyplon/lib
           mkdir pyplon/lib/x64
