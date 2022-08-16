@@ -55,9 +55,9 @@ jobs:
       - run: unzip -o pypylon-1.8.0-cp310-cp310-win_amd64.whl
       - run: fd
       - run: |
-          mkdir pyplon/lib
-          mkdir pyplon/lib/x64
-          copy pyplon/*.dll pyplon/lib/x64
+          mkdir pypylon/lib
+          mkdir pypylon/lib/x64
+          copy pypylon/*.dll pypylon/lib/x64
       - run: fd
       - name: build and run example
         run: |
