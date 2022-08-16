@@ -50,6 +50,7 @@ jobs:
           mkdir pypylon/include
           Move-Item -Path pypylon/pylon.framework/Versions/A/Headers -Destination pypylon/include/pylon
           copy pypylon/include/pylon/GenICam/* pypylon/include/
+          copy pypylon/include/pylon/GenICam/Base/* pypylon/include/
       - run: fd
       - run: curl -O https://files.pythonhosted.org/packages/52/39/34150ebccecff69baabb9f437b7ac784870c9ca4804a050a5b6afc59c404/pypylon-1.8.0-cp310-cp310-win_amd64.whl
       # unzip '-o' means to overwrite.
