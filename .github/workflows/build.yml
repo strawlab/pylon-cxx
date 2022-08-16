@@ -40,7 +40,8 @@ jobs:
       - run: |
           curl -O https://files.pythonhosted.org/packages/af/76/ba5b7fc37b4151a27b5c0244b6f0b37bf34ecfeac771cd49807c7ceff848/pypylon-1.8.0-cp310-cp310-macosx_10_14_universal2.whl
           unzip pypylon-1.8.0-cp310-cp310-macosx_10_14_universal2.whl
-          Move-Item -Path pypylon/pylon.framework/Versions/A/Headers -Destination pypylon/include
+          mkdir pypylon/include
+          Move-Item -Path pypylon/pylon.framework/Versions/A/Headers -Destination pypylon/include/pylon
       - uses: actions/checkout@v2
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
