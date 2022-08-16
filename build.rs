@@ -175,15 +175,27 @@ fn main() {
                 todo!()
             }
             Some(6) | None => {
-                assert!(pylon_major_version == Some(6) || pylon_major_version.is_none());
-                println!("cargo:rustc-link-search=framework=/Library/Frameworks/");
-                println!("cargo:rustc-link-lib=framework=pylon");
+                // directory with `pylon.framework`
+                let pylon_framework_dir = match std::env::var_os("PYLONFRAMEWORKDIR") {
+                    Some(val) => std::path::PathBuf::from(val),
+                    None => {
+                        todo!();
+                    }
+                };
 
+                assert!(pylon_major_version == Some(6) || pylon_major_version.is_none());
+                println!(
+                    "cargo:rustc-link-search=framework={}",
+                    pylon_framework_dir.display()
+                );
+                println!("cargo:rustc-link-lib=framework=pylon");
+                println!("cargo:rustc-link-arg=-Wl,-rpath,@loader_path");
+
+                let flag = format!("-F{}", pylon_framework_dir.display());
                 build
                     .flag("-std=c++14")
-                    .include("/Library/Frameworks/pylon.framework/Headers/GenICam")
-                    .include("/Library/Frameworks/pylon.framework/Headers")
-                    .flag("-F/Library/Frameworks");
+                    .include(pylon_framework_dir.join("pylon.framework/Versions/A/Headers/GenICam"))
+                    .flag(&flag);
             }
             Some(version) => panic!("unsupported pylon version: {}", version),
         }

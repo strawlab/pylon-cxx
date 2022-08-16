@@ -20,16 +20,6 @@ location. Build with normal rust commands. For example, to run the `grab` exampl
 
     cargo run --example grab
 
-### On macOS
-
-On macOS, check this:
-https://github.com/basler/pypylon/issues/6#issuecomment-403090732 In other
-words, do this:
-
-```
-export LD_LIBRARY_PATH=/Library/Frameworks/pylon.framework/Libraries
-```
-
 ## Camera emulation
 
 See [Basler's documentation](https://docs.baslerweb.com/camera-emulation.html). This can
