@@ -66,7 +66,7 @@ jobs:
           echo "five"
           dir pypylon\\lib\\x64\\
           echo "six"
-          type pypylon\\lib\\x64\\GCBase_MD__v3_1_Basler_pylon.exports
+          type pypylon\\lib\\x64\\GCBase_MD_VC141_v3_1_Basler_pylon.exports
           echo "seven"
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
