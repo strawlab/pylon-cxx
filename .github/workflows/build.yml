@@ -60,8 +60,12 @@ jobs:
           echo "three"
           copy pypylon/*.dll pypylon/lib/x64
           echo "four"
+          dir pypylon\\lib\\x64\\
+          echo "four.5"
           dumpbin /EXPORTS pypylon\\lib\\x64\\GCBase_MD__v3_1_Basler_pylon.dll > pypylon\\lib\\x64\\GCBase_MD__v3_1_Basler_pylon.exports
           echo "five"
+          dir pypylon\\lib\\x64\\
+          echo "six"
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
