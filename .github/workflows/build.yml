@@ -56,7 +56,7 @@ jobs:
           mkdir pypylon/lib
           mkdir pypylon/lib/x64
           copy pypylon/*.dll pypylon/lib/x64
-          dumpbin /EXPORTS pypylon/lib/x64/GCBase_MD__v3_1_Basler_pylon.dll > pypylon/lib/x64/GCBase_MD__v3_1_Basler_pylon.exports
+          dumpbin /EXPORTS pypylon\\lib\\x64\\GCBase_MD__v3_1_Basler_pylon.dll > pypylon\\lib\\x64\\GCBase_MD__v3_1_Basler_pylon.exports
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
