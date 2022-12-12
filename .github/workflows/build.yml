@@ -53,10 +53,15 @@ jobs:
       # unzip '-o' means to overwrite.
       - run: unzip -o pypylon-1.8.0-cp310-cp310-win_amd64.whl
       - run: |
+          echo "one"
           mkdir pypylon/lib
+          echo "two"
           mkdir pypylon/lib/x64
+          echo "three"
           copy pypylon/*.dll pypylon/lib/x64
+          echo "four"
           dumpbin /EXPORTS pypylon\\lib\\x64\\GCBase_MD__v3_1_Basler_pylon.dll > pypylon\\lib\\x64\\GCBase_MD__v3_1_Basler_pylon.exports
+          echo "five"
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
