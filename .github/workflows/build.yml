@@ -72,6 +72,8 @@ jobs:
           echo "four.5"
           dumpbin /EXPORTS pypylon\\lib\\x64\\GCBase_MD_VC141_v3_1_Basler_pylon.dll > pypylon\\lib\\x64\\GCBase_MD_VC141_v3_1_Basler_pylon.exports
           echo "five"
+          ./dm/bin/implib.exe pypylon\\lib\\x64\\GCBase_MD_VC141_v3_1_Basler_pylon.lib pypylon\\lib\\x64\\GCBase_MD_VC141_v3_1_Basler_pylon.dll
+          echo "five.5"
           dir pypylon\\lib\\x64\\
           echo "six"
           type pypylon\\lib\\x64\\GCBase_MD_VC141_v3_1_Basler_pylon.exports
