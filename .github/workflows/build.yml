@@ -52,8 +52,6 @@ jobs:
       - run: curl -O https://files.pythonhosted.org/packages/52/39/34150ebccecff69baabb9f437b7ac784870c9ca4804a050a5b6afc59c404/pypylon-1.8.0-cp310-cp310-win_amd64.whl
       # unzip '-o' means to overwrite.
       - run: unzip -o pypylon-1.8.0-cp310-cp310-win_amd64.whl
-      # See https://emsea.github.io/2018/07/13/lib-from-dll/
-      # powershell.exe -noprofile -executionpolicy bypass -file New-LibFromDll.ps1 extracted2\pypylon\PylonBase_v6_3.dll
       - run: |
           echo "one"
           mkdir pypylon/lib
@@ -64,12 +62,14 @@ jobs:
           echo "four"
           dir pypylon\\lib\\x64\\
           echo "four.5"
-          dumpbin /EXPORTS pypylon\\lib\\x64\\GCBase_MD_VC141_v3_1_Basler_pylon.dll > pypylon\\lib\\x64\\GCBase_MD_VC141_v3_1_Basler_pylon.exports
+          cd pypylon\\lib\\x64
           echo "five"
-          dir pypylon\\lib\\x64\\
+          ..\..\dll2lib GCBase_MD_VC141_v3_1_Basler_pylon.dll
           echo "six"
-          type pypylon\\lib\\x64\\GCBase_MD_VC141_v3_1_Basler_pylon.exports
+          cd ..\..
           echo "seven"
+          dir pypylon\\lib\\x64\\
+          echo "eight"
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
