@@ -38,13 +38,6 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2
-      - name: Install implib
-        shell: bash
-        run: |
-          set -euox pipefail
-          # Fetch implib
-          curl http://ftp.digitalmars.com/bup.zip -o bup.zip
-          7z x bup.zip dm/bin/implib.exe
       - name: Install dumpbin
         uses: ilammy/msvc-dev-cmd@v1
       - run: |
@@ -60,6 +53,7 @@ jobs:
       # unzip '-o' means to overwrite.
       - run: unzip -o pypylon-1.8.0-cp310-cp310-win_amd64.whl
       # See https://emsea.github.io/2018/07/13/lib-from-dll/
+      # powershell.exe -noprofile -executionpolicy bypass -file New-LibFromDll.ps1 extracted2\pypylon\PylonBase_v6_3.dll
       - run: |
           echo "one"
           mkdir pypylon/lib
@@ -72,8 +66,6 @@ jobs:
           echo "four.5"
           dumpbin /EXPORTS pypylon\\lib\\x64\\GCBase_MD_VC141_v3_1_Basler_pylon.dll > pypylon\\lib\\x64\\GCBase_MD_VC141_v3_1_Basler_pylon.exports
           echo "five"
-          ./dm/bin/implib.exe pypylon\\lib\\x64\\GCBase_MD_VC141_v3_1_Basler_pylon.lib pypylon\\lib\\x64\\GCBase_MD_VC141_v3_1_Basler_pylon.dll
-          echo "five.5"
           dir pypylon\\lib\\x64\\
           echo "six"
           type pypylon\\lib\\x64\\GCBase_MD_VC141_v3_1_Basler_pylon.exports
