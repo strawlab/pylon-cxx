@@ -1,4 +1,7 @@
-#![cfg_attr(feature = "backtrace", feature(backtrace))]
+#![cfg_attr(
+    feature = "backtrace",
+    feature(error_generic_member_access, provide_any)
+)]
 
 #[cfg(feature = "backtrace")]
 use std::backtrace::Backtrace;
@@ -54,8 +57,8 @@ impl std::fmt::Display for PylonError {
 
 impl std::error::Error for PylonError {
     #[cfg(feature = "backtrace")]
-    fn backtrace(&self) -> Option<&std::backtrace::Backtrace> {
-        Some(&self.backtrace)
+    fn provide<'a>(&'a self, req: &mut std::any::Demand<'a>) {
+        req.provide_ref::<std::backtrace::Backtrace>(&self.backtrace);
     }
 }
 

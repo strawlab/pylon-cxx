@@ -20,6 +20,17 @@ location. Build with normal rust commands. For example, to run the `grab` exampl
 
     cargo run --example grab
 
+### On macOS
+
+On macOS, building should work, but it is required update your environment
+variables to run the produced binaries:
+
+    export DYLD_LIBRARY_PATH="/Library/Frameworks/pylon.framework/Versions/A/Libraries/"
+
+I have seen articles like
+https://jorgen.tjer.no/post/2014/05/20/dt-rpath-ld-and-at-rpath-dyld/ which
+suggest a way to avoid this issue.
+
 ## Camera emulation
 
 See [Basler's documentation](https://docs.baslerweb.com/camera-emulation.html). This can

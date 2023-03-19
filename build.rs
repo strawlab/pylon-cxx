@@ -179,9 +179,7 @@ fn main() {
                 println!("cargo:rerun-if-env-changed=PYLONFRAMEWORKDIR");
                 let pylon_framework_dir = match std::env::var_os("PYLONFRAMEWORKDIR") {
                     Some(val) => std::path::PathBuf::from(val),
-                    None => {
-                        todo!();
-                    }
+                    None => "/Library/Frameworks".into(),
                 };
 
                 assert!(pylon_major_version == Some(6) || pylon_major_version.is_none());
