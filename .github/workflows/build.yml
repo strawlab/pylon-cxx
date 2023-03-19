@@ -38,6 +38,13 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2
+      - name: Install implib
+        shell: bash
+        run: |
+          set -euox pipefail
+          # Fetch implib
+          curl http://ftp.digitalmars.com/bup.zip -o bup.zip
+          7z x bup.zip dm/bin/implib.exe
       - name: Install dumpbin
         uses: ilammy/msvc-dev-cmd@v1
       - run: |
