@@ -175,15 +175,28 @@ fn main() {
                 todo!()
             }
             Some(6) | None => {
+                // directory with `pylon.framework`
+                println!("cargo:rerun-if-env-changed=PYLONFRAMEWORKDIR");
+                let pylon_framework_dir = match std::env::var_os("PYLONFRAMEWORKDIR") {
+                    Some(val) => std::path::PathBuf::from(val),
+                    None => "/Library/Frameworks".into(),
+                };
+
                 assert!(pylon_major_version == Some(6) || pylon_major_version.is_none());
-                println!("cargo:rustc-link-search=framework=/Library/Frameworks/");
+                println!(
+                    "cargo:rustc-link-search=framework={}",
+                    pylon_framework_dir.display()
+                );
                 println!("cargo:rustc-link-lib=framework=pylon");
 
+                // Look for pylon.framework in same dir as executable.
+                println!("cargo:rustc-link-arg=-Wl,-rpath,@loader_path");
+
+                let flag = format!("-F{}", pylon_framework_dir.display());
                 build
                     .flag("-std=c++14")
-                    .include("/Library/Frameworks/pylon.framework/Headers/GenICam")
-                    .include("/Library/Frameworks/pylon.framework/Headers")
-                    .flag("-F/Library/Frameworks");
+                    .include(pylon_framework_dir.join("pylon.framework/Versions/A/Headers/GenICam"))
+                    .flag(&flag);
             }
             Some(version) => panic!("unsupported pylon version: {}", version),
         }
@@ -193,9 +206,9 @@ fn main() {
     {
         use std::path::PathBuf;
 
-        let pylon_dev_dir = match std::env::var("PYLON_DEV_DIR") {
-            Ok(val) => PathBuf::from(val),
-            Err(_) => match pylon_major_version {
+        let pylon_dev_dir = match std::env::var_os("PYLON_DEV_DIR") {
+            Some(val) => PathBuf::from(val),
+            None => match pylon_major_version {
                 Some(5) => PathBuf::from(r#"C:\Program Files\Basler\pylon 5\Development"#),
                 Some(6) | None => PathBuf::from(r#"C:\Program Files\Basler\pylon 6\Development"#),
                 Some(version) => panic!("unsupported pylon version: {}", version),

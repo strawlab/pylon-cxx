@@ -22,13 +22,14 @@ location. Build with normal rust commands. For example, to run the `grab` exampl
 
 ### On macOS
 
-On macOS, check this:
-https://github.com/basler/pypylon/issues/6#issuecomment-403090732 In other
-words, do this:
+On macOS, building should work, but it is required update your environment
+variables to run the produced binaries:
 
-```
-export LD_LIBRARY_PATH=/Library/Frameworks/pylon.framework/Libraries
-```
+    export DYLD_LIBRARY_PATH="/Library/Frameworks/pylon.framework/Versions/A/Libraries/"
+
+I have seen articles like
+https://jorgen.tjer.no/post/2014/05/20/dt-rpath-ld-and-at-rpath-dyld/ which
+suggest a way to avoid this issue.
 
 ## Camera emulation
 
