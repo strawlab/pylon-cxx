@@ -64,7 +64,7 @@ jobs:
           echo "four.5"
           cd pypylon\\lib\\x64
           echo "five"
-          ..\..\dll2lib GCBase_MD_VC141_v3_1_Basler_pylon.dll
+          ..\..\dll2lib.bat GCBase_MD_VC141_v3_1_Basler_pylon.dll
           echo "six"
           cd ..\..
           echo "seven"
