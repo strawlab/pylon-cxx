@@ -71,7 +71,7 @@ jobs:
           dir pypylon\\lib\\x64\\
           echo "eight"
       - name: Setup Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
       - name: build and run example
