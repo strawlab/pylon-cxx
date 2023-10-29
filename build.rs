@@ -2,10 +2,12 @@ fn main() {
     println!("cargo:rerun-if-env-changed=PYLON_VERSION");
     println!("cargo:rerun-if-env-changed=PYLON_ROOT");
     println!("cargo:rerun-if-env-changed=PYLON_DEV_DIR");
+    println!("cargo:rerun-if-env-changed=PYLONFRAMEWORKDIR");
 
     let pylon_major_version: Option<u8> =
         std::env::var_os("PYLON_VERSION").map(|s| s.into_string().unwrap().parse::<u8>().unwrap());
 
+    println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rerun-if-changed=include/catcher.h");
     println!("cargo:rerun-if-changed=include/pylon-cxx-rs.h");
