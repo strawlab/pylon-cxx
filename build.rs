@@ -173,28 +173,34 @@ fn main() {
     #[cfg(target_os = "macos")]
     {
         match pylon_major_version {
-            Some(5) => {
-                todo!()
-            }
-            Some(6) | None => {
+            Some(6) | Some(7) | None => {
                 // directory with `pylon.framework`
-                println!("cargo:rerun-if-env-changed=PYLONFRAMEWORKDIR");
                 let pylon_framework_dir = match std::env::var_os("PYLONFRAMEWORKDIR") {
                     Some(val) => std::path::PathBuf::from(val),
                     None => "/Library/Frameworks".into(),
                 };
 
-                assert!(pylon_major_version == Some(6) || pylon_major_version.is_none());
-                println!(
-                    "cargo:rustc-link-search=framework={}",
-                    pylon_framework_dir.display()
+                assert!(
+                    pylon_major_version == Some(6)
+                        || pylon_major_version == Some(7)
+                        || pylon_major_version.is_none()
                 );
-                println!("cargo:rustc-link-lib=framework=pylon");
-
-                // Look for pylon.framework in same dir as executable.
-                println!("cargo:rustc-link-arg=-Wl,-rpath,@loader_path");
 
                 let flag = format!("-F{}", pylon_framework_dir.display());
+
+                println!("cargo:rustc-link-arg=-Wl,-ld_classic");
+
+                let lib_dir = pylon_framework_dir.join("pylon.framework/Libraries");
+                println!("cargo:rustc-link-search={}", lib_dir.display());
+                println!("cargo:rustc-link-lib=pylonbase");
+                println!("cargo:rustc-link-lib=pylonutility");
+                println!("cargo:rustc-link-lib=GenApi_gcc_v3_1_Basler_pylon");
+                println!("cargo:rustc-link-lib=GCBase_gcc_v3_1_Basler_pylon");
+                println!("cargo:rustc-link-lib=Log_gcc_v3_1_Basler_pylon");
+                println!("cargo:rustc-link-lib=MathParser_gcc_v3_1_Basler_pylon");
+                println!("cargo:rustc-link-lib=XmlParser_gcc_v3_1_Basler_pylon");
+                println!("cargo:rustc-link-lib=NodeMapData_gcc_v3_1_Basler_pylon");
+
                 build
                     .flag("-std=c++14")
                     .include(pylon_framework_dir.join("pylon.framework/Versions/A/Headers/GenICam"))
