@@ -230,5 +230,5 @@ fn main() {
         build.include(include_dir);
     }
 
-    build.compile("pyloncxxrs-demo");
+    build.compile("pyloncxxrs");
 }
