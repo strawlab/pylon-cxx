@@ -38,7 +38,7 @@ impl<'a> Stream for InstantCamera<'a> {
                     panic!("Camera FD failed with error: {}", e);
                 }
                 Poll::Pending => {
-                    continue;
+                    return Poll::Pending;
                 }
             }
         }
