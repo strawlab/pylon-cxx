@@ -272,6 +272,11 @@ pub fn pylon_version() -> PylonVersion {
     }
 }
 
+/// Terminate the Pylon library.
+///
+/// You should prefer dropping the [Pylon] instance instead. This is unsafe
+/// because the API cannot guarantee the Pylon library has been instantiated
+/// exactly once and will not be terminated again.
 pub unsafe fn terminate(shutdown_logging: bool) {
     ffi::PylonTerminate(shutdown_logging);
 }
