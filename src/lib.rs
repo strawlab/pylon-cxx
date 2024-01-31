@@ -272,6 +272,10 @@ pub fn pylon_version() -> PylonVersion {
     }
 }
 
+pub unsafe fn terminate(shutdown_logging: bool) {
+    ffi::PylonTerminate(shutdown_logging);
+}
+
 /// Wrap the CTlFactory type
 // Since in C++ `CTlFactory::GetInstance()` merely returns a reference to
 // a static object, here we don't store anything and instead get the
