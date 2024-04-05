@@ -13,10 +13,10 @@ fn main() -> anyhow::Result<()> {
     let filename = "NodeMap.pfs";
 
     println!("Saving camera's node map to file \"{}\".", filename);
-    camera.node_map().save(filename)?;
+    camera.node_map()?.save(filename)?;
 
     println!("Reading file back to camera's node map.");
-    camera.node_map().load(filename, true)?;
+    camera.node_map()?.load(filename, true)?;
 
     println!("Ok.");
     Ok(())

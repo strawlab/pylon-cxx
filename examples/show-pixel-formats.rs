@@ -7,7 +7,7 @@ fn main() -> anyhow::Result<()> {
 
     camera.open()?;
 
-    let pixel_format_node = camera.node_map().enum_node("PixelFormat")?;
+    let pixel_format_node = camera.node_map()?.enum_node("PixelFormat")?;
     for v in pixel_format_node.settable_values()? {
         println!("{}", v);
     }
