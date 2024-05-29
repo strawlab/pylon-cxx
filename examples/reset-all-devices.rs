@@ -16,7 +16,7 @@ fn main() -> anyhow::Result<()> {
         camera.open()?;
 
         {
-            let node = camera.node_map().command_node("DeviceReset")?;
+            let node = camera.node_map()?.command_node("DeviceReset")?;
             print!("  resetting...");
             node.execute(true)?;
             println!("OK");

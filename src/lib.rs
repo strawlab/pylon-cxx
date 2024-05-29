@@ -123,17 +123,18 @@ mod ffi {
             timeout_handling: TimeoutHandling,
         ) -> Result<bool>;
 
-        fn instant_camera_get_node_map(camera: &UniquePtr<CInstantCamera>) -> &MyNodeMap;
-        fn instant_camera_get_tl_node_map(camera: &UniquePtr<CInstantCamera>) -> &MyNodeMap;
+        fn instant_camera_get_node_map(camera: &UniquePtr<CInstantCamera>) -> Result<&MyNodeMap>;
+        fn instant_camera_get_tl_node_map(camera: &UniquePtr<CInstantCamera>)
+            -> Result<&MyNodeMap>;
         fn instant_camera_get_stream_grabber_node_map(
             camera: &UniquePtr<CInstantCamera>,
-        ) -> &MyNodeMap;
+        ) -> Result<&MyNodeMap>;
         fn instant_camera_get_event_grabber_node_map(
             camera: &UniquePtr<CInstantCamera>,
-        ) -> &MyNodeMap;
+        ) -> Result<&MyNodeMap>;
         fn instant_camera_get_instant_camera_node_map(
             camera: &UniquePtr<CInstantCamera>,
-        ) -> &MyNodeMap;
+        ) -> Result<&MyNodeMap>;
 
         fn node_map_load(node_map: &MyNodeMap, filename: String, validate: bool) -> Result<()>;
         fn node_map_save(node_map: &MyNodeMap, filename: String) -> Result<()>;
@@ -596,35 +597,35 @@ impl<'a> InstantCamera<'a> {
 
 /// These methods return the various node maps.
 impl<'a> InstantCamera<'a> {
-    pub fn node_map<'map>(&'a self) -> NodeMap<'map, 'a> {
-        NodeMap {
-            inner: ffi::instant_camera_get_node_map(&self.inner),
+    pub fn node_map<'map>(&'a self) -> PylonResult<NodeMap<'map, 'a>> {
+        Ok(NodeMap {
+            inner: ffi::instant_camera_get_node_map(&self.inner)?,
             parent: std::marker::PhantomData,
-        }
+        })
     }
-    pub fn tl_node_map<'map>(&'a self) -> NodeMap<'map, 'a> {
-        NodeMap {
-            inner: ffi::instant_camera_get_tl_node_map(&self.inner),
+    pub fn tl_node_map<'map>(&'a self) -> PylonResult<NodeMap<'map, 'a>> {
+        Ok(NodeMap {
+            inner: ffi::instant_camera_get_tl_node_map(&self.inner)?,
             parent: std::marker::PhantomData,
-        }
+        })
     }
-    pub fn stream_grabber_node_map<'map>(&'a self) -> NodeMap<'map, 'a> {
-        NodeMap {
-            inner: ffi::instant_camera_get_stream_grabber_node_map(&self.inner),
+    pub fn stream_grabber_node_map<'map>(&'a self) -> PylonResult<NodeMap<'map, 'a>> {
+        Ok(NodeMap {
+            inner: ffi::instant_camera_get_stream_grabber_node_map(&self.inner)?,
             parent: std::marker::PhantomData,
-        }
+        })
     }
-    pub fn event_grabber_node_map<'map>(&'a self) -> NodeMap<'map, 'a> {
-        NodeMap {
-            inner: ffi::instant_camera_get_event_grabber_node_map(&self.inner),
+    pub fn event_grabber_node_map<'map>(&'a self) -> PylonResult<NodeMap<'map, 'a>> {
+        Ok(NodeMap {
+            inner: ffi::instant_camera_get_event_grabber_node_map(&self.inner)?,
             parent: std::marker::PhantomData,
-        }
+        })
     }
-    pub fn instant_camera_node_map<'map>(&'a self) -> NodeMap<'map, 'a> {
-        NodeMap {
-            inner: ffi::instant_camera_get_instant_camera_node_map(&self.inner),
+    pub fn instant_camera_node_map<'map>(&'a self) -> PylonResult<NodeMap<'map, 'a>> {
+        Ok(NodeMap {
+            inner: ffi::instant_camera_get_instant_camera_node_map(&self.inner)?,
             parent: std::marker::PhantomData,
-        }
+        })
     }
 }
 
