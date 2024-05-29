@@ -31,7 +31,7 @@ impl<'a> Stream for InstantCamera<'a> {
                                 },
                             Err(_) => {
                                 return Poll::Ready(None)
-                        }        
+                        }
                     }
                 }
                 Poll::Ready(Err(e)) => {
