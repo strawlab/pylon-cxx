@@ -30,7 +30,7 @@ anyhow = "1"
 
 [features]
 backtrace = []
-stream = ["tokio", "tokio-stream"]
+stream = ["dep:tokio", "dep:tokio-stream"]
 
 [[example]]
 name = "async-grab"
