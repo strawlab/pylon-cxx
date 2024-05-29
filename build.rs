@@ -19,7 +19,7 @@ fn main() {
         .file("src/pylon-cxx-rs.cc")
         .warnings(false)
         .cpp(true)
-        .include("include".to_string());
+        .include("include");
 
     #[cfg(feature = "stream")]
     build.define("FEATURE_STREAM", None);
