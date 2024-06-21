@@ -563,7 +563,10 @@ impl<'a> InstantCamera<'a> {
     }
 
     pub fn stop_grabbing(&self) -> PylonResult<()> {
-        ffi::instant_camera_stop_grabbing(&self.inner).into_rust()
+        ffi::instant_camera_stop_grabbing(&self.inner).into_rust()?;
+        #[cfg(feature = "stream")]
+        self.fd.replace(None);
+        Ok(())
     }
 
     pub fn is_grabbing(&self) -> bool {

@@ -90,4 +90,23 @@ mod tests {
 
         Ok(())
     }
+
+    #[tokio::test]
+    async fn start_stop_loop_works() -> PylonResult<()> {
+        let pylon = Pylon::new();
+        let cam = TlFactory::instance(&pylon).create_first_device()?;
+        cam.open()?;
+        tokio::pin!(cam);
+        for _ in 0..5 {
+            let mut images = 10;
+            cam.start_grabbing(&GrabOptions::default().count(images))?;
+            while let Some(res) = cam.next().await {
+                images -= 1;
+                assert!(res.grab_succeeded()?);
+            }
+            assert_eq!(images, 0);
+            cam.stop_grabbing()?;
+        }
+        Ok(())
+    }
 }
