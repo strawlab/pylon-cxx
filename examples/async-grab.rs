@@ -8,7 +8,7 @@ async fn main() -> anyhow::Result<()> {
     let pylon = pylon_cxx::Pylon::new();
 
     // Create an instant camera object with the camera device found first.
-    let camera = pylon_cxx::TlFactory::instance(&pylon).create_first_device()?;
+    let mut camera = pylon_cxx::TlFactory::instance(&pylon).create_first_device()?;
 
     // Print the model name of the camera.
     println!("Using device {:?}", camera.device_info().model_name()?);
@@ -29,8 +29,6 @@ async fn main() -> anyhow::Result<()> {
         ),
         Err(e) => eprintln!("Ignoring error getting PixelFormat node: {}", e),
     };
-
-    tokio::pin!(camera);
 
     // The stream automatically stops when COUNT_IMAGES_TO_GRAB images have been grabbed .
     //

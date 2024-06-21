@@ -54,10 +54,9 @@ mod tests {
     async fn streaming_works() -> PylonResult<()> {
         let mut images = 10;
         let pylon = Pylon::new();
-        let cam = TlFactory::instance(&pylon).create_first_device()?;
+        let mut cam = TlFactory::instance(&pylon).create_first_device()?;
         cam.open()?;
         cam.start_grabbing(&GrabOptions::default().count(images))?;
-        tokio::pin!(cam);
         while let Some(res) = cam.next().await {
             images -= 1;
             assert!(res.grab_succeeded()?);
@@ -94,9 +93,8 @@ mod tests {
     #[tokio::test]
     async fn start_stop_loop_works() -> PylonResult<()> {
         let pylon = Pylon::new();
-        let cam = TlFactory::instance(&pylon).create_first_device()?;
+        let mut cam = TlFactory::instance(&pylon).create_first_device()?;
         cam.open()?;
-        tokio::pin!(cam);
         for _ in 0..5 {
             let mut images = 10;
             cam.start_grabbing(&GrabOptions::default().count(images))?;
