@@ -6,11 +6,11 @@
 #include "pylon/PylonIncludes.h"
 #include "pylon-cxx-rs.h"
 
-std::unique_ptr<std::vector<std::string>> to_std_vec_str(Pylon::StringList_t names)
+std::unique_ptr<std::vector<std::string>> to_std_vec_str(const Pylon::StringList_t& names)
 {
     auto result = std::make_unique<std::vector<std::string>>();
 
-    for (Pylon::StringList_t::iterator it = names.begin(); it != names.end(); ++it)
+    for (Pylon::StringList_t::const_iterator it = names.begin(); it != names.end(); ++it)
     {
         result->push_back(std::string(it->c_str()));
     }
