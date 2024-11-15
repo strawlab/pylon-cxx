@@ -13,6 +13,12 @@ namespace Pylon
         Return,
         ThrowException,
     };
+    enum GrabStrategy {
+        OneByOne,
+        LatestImageOnly,
+        LatestImages,
+        UpcomingImage
+    };
 
     std::unique_ptr<CInstantCamera> tl_factory_create_first_device();
     std::unique_ptr<CInstantCamera> tl_factory_create_device(const CDeviceInfo &);
@@ -36,7 +42,9 @@ namespace Pylon
     rust::String node_map_save_to_string(const MyNodeMap&);
 
     void instant_camera_start_grabbing(const std::unique_ptr<CInstantCamera> &);
+    void instant_camera_start_grabbing_with_strategy(const std::unique_ptr<CInstantCamera> &, GrabStrategy);
     void instant_camera_start_grabbing_with_count(const std::unique_ptr<CInstantCamera> &, uint32_t);
+    void instant_camera_start_grabbing_with_count_and_strategy(const std::unique_ptr<CInstantCamera> &, uint32_t, GrabStrategy);
     void instant_camera_stop_grabbing(const std::unique_ptr<CInstantCamera> &);
     bool instant_camera_is_grabbing(const std::unique_ptr<CInstantCamera> &);
 

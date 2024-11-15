@@ -68,6 +68,13 @@ mod ffi {
         Return,
         ThrowException,
     }
+    #[repr(u32)]
+    enum GrabStrategy {
+        OneByOne,
+        LatestImageOnly,
+        LatestImages,
+        UpcomingImage
+    }
 
     unsafe extern "C++" {
         include!("pylon/PylonIncludes.h");
@@ -79,6 +86,7 @@ mod ffi {
         type CDeviceInfo;
         type CGrabResultPtr;
         type TimeoutHandling;
+        type GrabStrategy;
         type CBooleanParameter;
         type CIntegerParameter;
         type CFloatParameter;
@@ -109,9 +117,18 @@ mod ffi {
         fn instant_camera_close(camera: &UniquePtr<CInstantCamera>) -> Result<()>;
         fn instant_camera_start_grabbing(camera: &UniquePtr<CInstantCamera>) -> Result<()>;
         fn instant_camera_stop_grabbing(camera: &UniquePtr<CInstantCamera>) -> Result<()>;
+        fn instant_camera_start_grabbing_with_strategy(
+            camera: &UniquePtr<CInstantCamera>,
+            grab_strategy: GrabStrategy,
+        ) -> Result<()>;
         fn instant_camera_start_grabbing_with_count(
             camera: &UniquePtr<CInstantCamera>,
             count: u32,
+        ) -> Result<()>;
+        fn instant_camera_start_grabbing_with_count_and_strategy(
+            camera: &UniquePtr<CInstantCamera>,
+            count: u32,
+            grab_strategy: GrabStrategy,
         ) -> Result<()>;
         fn instant_camera_is_grabbing(camera: &UniquePtr<CInstantCamera>) -> bool;
         #[cfg(feature = "stream")]
@@ -226,6 +243,7 @@ mod ffi {
     }
 }
 pub use ffi::TimeoutHandling;
+pub use ffi::GrabStrategy;
 
 pub struct Pylon {}
 
@@ -390,11 +408,12 @@ impl<'map, 'parent: 'map> NodeMap<'map, 'parent> {
 #[derive(Default)]
 pub struct GrabOptions {
     count: Option<u32>,
+    strategy: Option<GrabStrategy>,
 }
 
 impl GrabOptions {
     pub fn count(self, count: u32) -> GrabOptions {
-        Self { count: Some(count) }
+        Self { count: Some(count), strategy: None }
     }
 }
 
@@ -554,11 +573,11 @@ impl<'a> InstantCamera<'a> {
             }
         }
 
-        match options.count {
-            None => ffi::instant_camera_start_grabbing(&self.inner).into_rust(),
-            Some(count) => {
-                ffi::instant_camera_start_grabbing_with_count(&self.inner, count).into_rust()
-            }
+        match (options.count, options.strategy) {
+            (Some(count), Some(strategy)) => ffi::instant_camera_start_grabbing_with_count_and_strategy(&self.inner, count, strategy).into_rust(),
+            (Some(count), None) => ffi::instant_camera_start_grabbing_with_count(&self.inner, count).into_rust(),
+            (None, Some(strategy)) => ffi::instant_camera_start_grabbing_with_strategy(&self.inner, strategy).into_rust(),
+            (None, None) => ffi::instant_camera_start_grabbing(&self.inner).into_rust(),
         }
     }
 
