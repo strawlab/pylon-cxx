@@ -73,7 +73,7 @@ mod ffi {
         OneByOne,
         LatestImageOnly,
         LatestImages,
-        UpcomingImage
+        UpcomingImage,
     }
 
     unsafe extern "C++" {
@@ -242,8 +242,8 @@ mod ffi {
         fn device_info_get_model_name(device_info: &UniquePtr<CDeviceInfo>) -> Result<String>;
     }
 }
-pub use ffi::TimeoutHandling;
 pub use ffi::GrabStrategy;
+pub use ffi::TimeoutHandling;
 
 pub struct Pylon {}
 
@@ -412,8 +412,18 @@ pub struct GrabOptions {
 }
 
 impl GrabOptions {
-    pub fn count(self, count: u32) -> GrabOptions {
-        Self { count: Some(count), strategy: None }
+    pub fn count(&self, count: u32) -> GrabOptions {
+        Self {
+            count: Some(count),
+            strategy: self.strategy,
+        }
+    }
+
+    pub fn strategy(&self, strategy: GrabStrategy) -> GrabOptions {
+        Self {
+            count: self.count,
+            strategy: Some(strategy),
+        }
     }
 }
 
@@ -574,9 +584,20 @@ impl<'a> InstantCamera<'a> {
         }
 
         match (options.count, options.strategy) {
-            (Some(count), Some(strategy)) => ffi::instant_camera_start_grabbing_with_count_and_strategy(&self.inner, count, strategy).into_rust(),
-            (Some(count), None) => ffi::instant_camera_start_grabbing_with_count(&self.inner, count).into_rust(),
-            (None, Some(strategy)) => ffi::instant_camera_start_grabbing_with_strategy(&self.inner, strategy).into_rust(),
+            (Some(count), Some(strategy)) => {
+                ffi::instant_camera_start_grabbing_with_count_and_strategy(
+                    &self.inner,
+                    count,
+                    strategy,
+                )
+                .into_rust()
+            }
+            (Some(count), None) => {
+                ffi::instant_camera_start_grabbing_with_count(&self.inner, count).into_rust()
+            }
+            (None, Some(strategy)) => {
+                ffi::instant_camera_start_grabbing_with_strategy(&self.inner, strategy).into_rust()
+            }
             (None, None) => ffi::instant_camera_start_grabbing(&self.inner).into_rust(),
         }
     }
