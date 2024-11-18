@@ -412,17 +412,17 @@ pub struct GrabOptions {
 }
 
 impl GrabOptions {
-    pub fn count(&self, count: u32) -> GrabOptions {
+    pub fn count(self, count: u32) -> GrabOptions {
         Self {
             count: Some(count),
-            strategy: self.strategy,
+            ..self
         }
     }
 
-    pub fn strategy(&self, strategy: GrabStrategy) -> GrabOptions {
+    pub fn strategy(self, strategy: GrabStrategy) -> GrabOptions {
         Self {
-            count: self.count,
             strategy: Some(strategy),
+            ..self
         }
     }
 }
