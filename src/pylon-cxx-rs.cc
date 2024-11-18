@@ -6,11 +6,11 @@
 #include "pylon/PylonIncludes.h"
 #include "pylon-cxx-rs.h"
 
-std::unique_ptr<std::vector<std::string>> to_std_vec_str(Pylon::StringList_t names)
+std::unique_ptr<std::vector<std::string>> to_std_vec_str(const Pylon::StringList_t& names)
 {
     auto result = std::make_unique<std::vector<std::string>>();
 
-    for (Pylon::StringList_t::iterator it = names.begin(); it != names.end(); ++it)
+    for (Pylon::StringList_t::const_iterator it = names.begin(); it != names.end(); ++it)
     {
         result->push_back(std::string(it->c_str()));
     }
@@ -20,6 +20,31 @@ std::unique_ptr<std::vector<std::string>> to_std_vec_str(Pylon::StringList_t nam
 
 namespace Pylon
 {
+    EGrabStrategy convert_grab_strategy(GrabStrategy strategy)
+    {
+        EGrabStrategy es = GrabStrategy_OneByOne;
+        if (strategy == GrabStrategy::OneByOne)
+        {
+            es = GrabStrategy_OneByOne;
+        }
+        else if (strategy == GrabStrategy::LatestImageOnly)
+        {
+            es = GrabStrategy_LatestImageOnly;
+        }
+        else if (strategy == GrabStrategy::LatestImages)
+        {
+            es = GrabStrategy_LatestImages;
+        }
+        else if (strategy == GrabStrategy::UpcomingImage)
+        {
+            es = GrabStrategy_UpcomingImage;
+        }
+        else
+        {
+            throw std::exception();
+        }
+        return es;
+    }
 
     std::unique_ptr<CInstantCamera> tl_factory_create_first_device()
     {
@@ -127,9 +152,19 @@ namespace Pylon
         camera->StartGrabbing();
     }
 
+    void instant_camera_start_grabbing_with_strategy(const std::unique_ptr<CInstantCamera> &camera, GrabStrategy strategy)
+    {
+        camera->StartGrabbing(convert_grab_strategy(strategy));
+    }
+
     void instant_camera_start_grabbing_with_count(const std::unique_ptr<CInstantCamera> &camera, uint32_t count)
     {
         camera->StartGrabbing(count);
+    }
+
+    void instant_camera_start_grabbing_with_count_and_strategy(const std::unique_ptr<CInstantCamera> &camera, uint32_t count, GrabStrategy strategy)
+    {
+        camera->StartGrabbing(count, convert_grab_strategy(strategy));
     }
 
     void instant_camera_stop_grabbing(const std::unique_ptr<CInstantCamera> &camera)
