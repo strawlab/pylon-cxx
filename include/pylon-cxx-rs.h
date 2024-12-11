@@ -98,6 +98,7 @@ namespace Pylon
     uint64_t grab_result_time_stamp(const std::unique_ptr<CGrabResultPtr> &grab_result);
     size_t grab_result_stride(const std::unique_ptr<CGrabResultPtr> &grab_result);
     uint32_t grab_result_image_size(const std::unique_ptr<CGrabResultPtr> &grab_result);
+    const MyNodeMap& grab_result_get_chunk_data_node_map(const std::unique_ptr<CGrabResultPtr> &grab_result);
 
     std::unique_ptr<CDeviceInfo> device_info_copy(const CDeviceInfo &);
     std::unique_ptr<std::vector<std::string>> device_info_get_property_names(const std::unique_ptr<CDeviceInfo> &);
