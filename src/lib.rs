@@ -542,7 +542,7 @@ impl CommandNode {
     }
 }
 
-unsafe impl<'a> Send for InstantCamera<'a> {}
+unsafe impl Send for InstantCamera<'_> {}
 
 impl<'a> InstantCamera<'a> {
     pub fn new(lib: &'a Pylon, inner: cxx::UniquePtr<ffi::CInstantCamera>) -> Self {
