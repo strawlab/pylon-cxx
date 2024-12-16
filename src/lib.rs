@@ -230,6 +230,9 @@ mod ffi {
         fn grab_result_time_stamp(grab_result: &UniquePtr<CGrabResultPtr>) -> Result<u64>;
         fn grab_result_stride(grab_result: &UniquePtr<CGrabResultPtr>) -> Result<usize>;
         fn grab_result_image_size(grab_result: &UniquePtr<CGrabResultPtr>) -> Result<u32>;
+        fn grab_result_get_chunk_data_node_map(
+            grab_result: &UniquePtr<CGrabResultPtr>,
+        ) -> Result<&MyNodeMap>;
 
         fn device_info_copy(device_info: &CDeviceInfo) -> UniquePtr<CDeviceInfo>;
         fn device_info_get_property_names(
@@ -542,7 +545,7 @@ impl CommandNode {
     }
 }
 
-unsafe impl<'a> Send for InstantCamera<'a> {}
+unsafe impl Send for InstantCamera<'_> {}
 
 impl<'a> InstantCamera<'a> {
     pub fn new(lib: &'a Pylon, inner: cxx::UniquePtr<ffi::CInstantCamera>) -> Self {
@@ -745,6 +748,13 @@ impl GrabResult {
 
     pub fn image_size(&self) -> PylonResult<u32> {
         ffi::grab_result_image_size(&self.inner).into_rust()
+    }
+
+    pub fn chunk_data_node_map<'map>(&self) -> PylonResult<NodeMap<'map, '_>> {
+        Ok(NodeMap {
+            inner: ffi::grab_result_get_chunk_data_node_map(&self.inner)?,
+            parent: std::marker::PhantomData,
+        })
     }
 }
 

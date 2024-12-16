@@ -429,6 +429,11 @@ namespace Pylon
         return (*grab_result)->GetImageSize();
     }
 
+    const MyNodeMap& grab_result_get_chunk_data_node_map(const std::unique_ptr<CGrabResultPtr> &grab_result)
+    {
+        return (*grab_result)->GetChunkDataNodeMap();
+    }
+
     std::unique_ptr<CDeviceInfo> device_info_copy(const CDeviceInfo &device_info)
     {
         return std::make_unique<CDeviceInfo>(device_info);
