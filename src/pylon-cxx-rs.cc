@@ -1,4 +1,4 @@
-#if defined(FEATURE_STREAM)
+#if defined(FEATURE_STREAM_LINUX)
 #include <unistd.h>
 #include <fcntl.h>
 #endif
@@ -178,9 +178,15 @@ namespace Pylon
         return camera->IsGrabbing();
     }
 
-    #if defined(FEATURE_STREAM)
+    #if defined(FEATURE_STREAM_LINUX)
     int instant_camera_wait_object_fd(const std::unique_ptr<CInstantCamera> &camera) {
       return camera->GetGrabResultWaitObject().GetFd();
+    }
+    #endif
+
+    #if defined(FEATURE_STREAM_WINDOWS)
+    std::unique_ptr<WaitObject> instant_camera_wait_object(const std::unique_ptr<CInstantCamera> &camera) {
+      return std::make_unique<WaitObject>(camera->GetGrabResultWaitObject());
     }
     #endif
 
@@ -466,6 +472,10 @@ namespace Pylon
     {
         // This copies the data.
         return rust::String(device_info->GetModelName());
+    }
+
+    bool wait_object_wait(const std::unique_ptr<WaitObject> &wait_object, uint64_t timeout) {
+        return wait_object->Wait(timeout);
     }
 
 } // namespace Pylon
