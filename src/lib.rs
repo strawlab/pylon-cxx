@@ -9,8 +9,14 @@ pub mod stream_linux;
 #[cfg(feature = "stream")]
 use std::cell::RefCell;
 
-#[cfg(all(target_os = "windows", feature = "stream"))]        
+#[cfg(all(target_os = "windows", feature = "stream"))]
+use std::thread::JoinHandle;
+
+#[cfg(all(target_os = "windows", feature = "stream"))]
 pub mod stream_windows;
+
+#[cfg(all(test, feature = "stream"))]
+mod async_tests;
 
 #[derive(Debug)]
 pub struct PylonError {
@@ -63,7 +69,6 @@ impl std::error::Error for PylonError {
 }
 
 pub type PylonResult<T> = Result<T, PylonError>;
-
 
 #[cxx::bridge(namespace = Pylon)]
 mod ffi {
@@ -137,9 +142,9 @@ mod ffi {
             grab_strategy: GrabStrategy,
         ) -> Result<()>;
         fn instant_camera_is_grabbing(camera: &UniquePtr<CInstantCamera>) -> bool;
-        #[cfg(all(target_os="linux", feature = "stream"))]
+        #[cfg(all(target_os = "linux", feature = "stream"))]
         fn instant_camera_wait_object_fd(camera: &UniquePtr<CInstantCamera>) -> i32;
-        #[cfg(all(target_os="windows", feature = "stream"))]
+        #[cfg(all(target_os = "windows", feature = "stream"))]
         fn instant_camera_wait_object(camera: &UniquePtr<CInstantCamera>) -> UniquePtr<WaitObject>;
         fn instant_camera_retrieve_result(
             camera: &UniquePtr<CInstantCamera>,
@@ -251,6 +256,7 @@ mod ffi {
             name: &str,
         ) -> Result<String>;
         fn device_info_get_model_name(device_info: &UniquePtr<CDeviceInfo>) -> Result<String>;
+        #[cfg(all(target_os = "windows", feature = "stream"))]
         fn wait_object_wait(wait_object: &UniquePtr<WaitObject>, timeout: u64) -> Result<bool>;
     }
 }
@@ -346,16 +352,18 @@ impl<'a> TlFactory<'a> {
     }
 }
 
-#[cfg(all(target_os = "windows", feature = "stream"))] 
+#[cfg(all(target_os = "windows", feature = "stream"))]
 pub struct WaitObject(cxx::UniquePtr<ffi::WaitObject>);
 
-#[cfg(all(target_os = "windows", feature = "stream"))] 
+#[cfg(all(target_os = "windows", feature = "stream"))]
 impl WaitObject {
-    pub fn Wait(&self, timeout: u64) -> PylonResult<bool> {
+    pub fn wait(&self, timeout: u64) -> PylonResult<bool> {
         Ok(ffi::wait_object_wait(&self.0, timeout)?)
     }
 }
 
+#[cfg(all(target_os = "windows", feature = "stream"))]
+unsafe impl Send for WaitObject {}
 
 /// Wrap the CInstantCamera type
 pub struct InstantCamera<'a> {
@@ -365,7 +373,7 @@ pub struct InstantCamera<'a> {
     #[cfg(all(target_os = "linux", feature = "stream"))]
     fd: RefCell<Option<tokio::io::unix::AsyncFd<std::os::unix::io::RawFd>>>,
     #[cfg(all(target_os = "windows", feature = "stream"))]
-    wait_object: RefCell<Option<WaitObject>>
+    wait_thread: RefCell<Option<JoinHandle<()>>>,
 }
 
 /// Wrap the `GenApi::INodeMap` type.
@@ -577,7 +585,7 @@ impl<'a> InstantCamera<'a> {
             #[cfg(all(target_os = "linux", feature = "stream"))]
             fd: RefCell::new(None),
             #[cfg(all(target_os = "windows", feature = "stream"))]
-            wait_object: RefCell::new(None),
+            wait_thread: RefCell::new(None),
         }
     }
 
@@ -610,15 +618,6 @@ impl<'a> InstantCamera<'a> {
             }
         }
 
-        #[cfg(all(target_os = "windows", feature = "stream"))]
-        {
-            if tokio::runtime::Handle::try_current().is_ok() {
-                self.wait_object.replace(Some(
-                    self.get_grab_result_wait_object()?,
-                ));
-            }
-        }
-
         match (options.count, options.strategy) {
             (Some(count), Some(strategy)) => {
                 ffi::instant_camera_start_grabbing_with_count_and_strategy(
@@ -642,6 +641,9 @@ impl<'a> InstantCamera<'a> {
         ffi::instant_camera_stop_grabbing(&self.inner).into_rust()?;
         #[cfg(all(target_os = "linux", feature = "stream"))]
         self.fd.replace(None);
+
+        #[cfg(all(target_os = "windows", feature = "stream"))]
+        self.wait_thread.replace(None);
         Ok(())
     }
 

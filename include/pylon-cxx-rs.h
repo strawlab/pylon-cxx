@@ -109,5 +109,7 @@ namespace Pylon
     rust::String device_info_get_property_value(const std::unique_ptr<CDeviceInfo> &, rust::Str);
     rust::String device_info_get_model_name(const std::unique_ptr<CDeviceInfo> &);
 
+    #if defined(FEATURE_STREAM_WINDOWS)
     bool wait_object_wait(const std::unique_ptr<WaitObject>& wait_object, uint64_t timeout);
+    #endif
 } // namespace Pylon

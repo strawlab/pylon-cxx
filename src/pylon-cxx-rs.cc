@@ -474,8 +474,10 @@ namespace Pylon
         return rust::String(device_info->GetModelName());
     }
 
+    #if defined(FEATURE_STREAM_WINDOWS)
     bool wait_object_wait(const std::unique_ptr<WaitObject> &wait_object, uint64_t timeout) {
         return wait_object->Wait(timeout);
     }
+    #endif
 
 } // namespace Pylon

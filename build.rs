@@ -30,7 +30,6 @@ fn main() {
     #[cfg(all(target_os = "macos", feature = "stream"))]
     panic!("Stream feature not supported in macos");
 
-
     #[cfg(target_os = "linux")]
     {
         let pylon_root = match std::env::var("PYLON_ROOT") {
