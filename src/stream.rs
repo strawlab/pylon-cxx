@@ -3,7 +3,7 @@ use std::pin::Pin;
 use std::task::{Context, Poll};
 use tokio_stream::Stream;
 
-impl<'a> Stream for InstantCamera<'a> {
+impl Stream for InstantCamera {
     type Item = GrabResult;
 
     fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<GrabResult>> {
