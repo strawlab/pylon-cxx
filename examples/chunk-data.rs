@@ -18,15 +18,18 @@ fn main() -> anyhow::Result<()> {
     node_map.boolean_node("ChunkModeActive")?.set_value(true)?;
 
     // enable some chunk data
-    node_map
-        .enum_node("ChunkSelector")?
-        .set_value("Framecounter")?;
-    node_map.boolean_node("ChunkEnable")?.set_value(true)?;
-
-    node_map
-        .enum_node("ChunkSelector")?
-        .set_value("Timestamp")?;
-    node_map.boolean_node("ChunkEnable")?.set_value(true)?;
+    let mut enabled_chunks = vec![];
+    for var in ["Framecounter", "Timestamp"] {
+        match node_map.enum_node("ChunkSelector")?.set_value(var) {
+            Ok(()) => {
+                node_map.boolean_node("ChunkEnable")?.set_value(true)?;
+                enabled_chunks.push(var);
+            }
+            Err(e) => {
+                eprintln!("When attemping to set ChunkSelector to {var}: {e}");
+            }
+        };
+    }
 
     // Start the grabbing of COUNT_IMAGES_TO_GRAB images.
     // The camera device is parameterized with a default configuration which
@@ -60,14 +63,18 @@ fn main() -> anyhow::Result<()> {
             println!("SizeY: {}", grab_result.height()?);
 
             let image_buffer = grab_result.buffer()?;
-            println!("Value of first pixel: {}\n", image_buffer[0]);
+            println!("Value of first pixel: {}", image_buffer[0]);
 
             let chunk_map = grab_result.chunk_data_node_map()?;
-            println!(
-                "Chunk data - Framecounter: {}, Timestamp: {}",
-                chunk_map.integer_node("ChunkFramecounter")?.value()?,
-                chunk_map.integer_node("ChunkTimestamp")?.value()?
-            );
+            let mut chunk_strs = vec![];
+            for chunk in enabled_chunks.iter() {
+                let name = format!("Chunk{chunk}");
+                chunk_strs.push(format!(
+                    "{chunk}: {}",
+                    chunk_map.integer_node(&name)?.value()?
+                ));
+            }
+            println!("{}\n", chunk_strs.join(","));
         } else {
             println!(
                 "Error: {} {}",

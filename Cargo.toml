@@ -2,12 +2,13 @@
 name = "pylon-cxx"
 description = "Rust wrapper of the Pylon libraries for Basler cameras"
 license = "MIT OR Apache-2.0"
-version = "0.4.2"
+version = "0.4.3"
 authors = [
     "Andrew Straw <strawman@astraw.com>",
     "Falco Hirschenberger <falco.hirschenberger@gmail.com>",
 ]
 edition = "2018"
+resolver = "2"
 repository = "https://github.com/strawlab/pylon-cxx"
 keywords = ["basler", "camera", "bindings", "pylon", "image"]
 categories = [
@@ -22,6 +23,9 @@ cxx = "1.0.65"
 tokio = { version = "1", features = ["rt", "macros", "net"], optional = true }
 tokio-stream = { version = "0.1.8", optional = true }
 
+[target.'cfg(target_os = "windows")'.dependencies]
+winapi = { version = "0.3.9", optional = true, features = ["winbase", "winerror", "synchapi"]}
+
 [build-dependencies]
 cxx-build = "1.0.65"
 
@@ -30,7 +34,7 @@ anyhow = "1"
 
 [features]
 backtrace = []
-stream = ["dep:tokio", "dep:tokio-stream"]
+stream = ["dep:tokio", "dep:tokio-stream", "dep:winapi"]
 
 [[example]]
 name = "async-grab"

@@ -48,9 +48,13 @@ namespace Pylon
     void instant_camera_stop_grabbing(const std::unique_ptr<CInstantCamera> &);
     bool instant_camera_is_grabbing(const std::unique_ptr<CInstantCamera> &);
 
-    #if defined(FEATURE_STREAM)
+    #if defined(FEATURE_STREAM_LINUX)
     int instant_camera_wait_object_fd(const std::unique_ptr<CInstantCamera> &);
     #endif
+    #if defined(FEATURE_STREAM_WINDOWS)
+    std::unique_ptr<WaitObject> instant_camera_wait_object(const std::unique_ptr<CInstantCamera> &);
+    #endif
+
     bool instant_camera_retrieve_result(const std::unique_ptr<CInstantCamera> &, uint32_t, std::unique_ptr<CGrabResultPtr> &, TimeoutHandling);
 
     std::unique_ptr<CBooleanParameter> node_map_get_boolean_parameter(const MyNodeMap&, rust::Str);
@@ -105,4 +109,7 @@ namespace Pylon
     rust::String device_info_get_property_value(const std::unique_ptr<CDeviceInfo> &, rust::Str);
     rust::String device_info_get_model_name(const std::unique_ptr<CDeviceInfo> &);
 
+    #if defined(FEATURE_STREAM_WINDOWS)
+    bool wait_object_wait(const std::unique_ptr<WaitObject>& wait_object, uint64_t timeout);
+    #endif
 } // namespace Pylon
