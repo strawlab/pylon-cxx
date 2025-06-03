@@ -6,7 +6,7 @@ use std::{
 use crate::{GrabResult, InstantCamera, TimeoutHandling};
 use tokio_stream::Stream;
 
-impl Stream for InstantCamera<'_> {
+impl Stream for InstantCamera {
     type Item = GrabResult;
 
     fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<GrabResult>> {

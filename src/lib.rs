@@ -8,6 +8,8 @@ pub mod stream_linux;
 
 #[cfg(feature = "stream")]
 use std::cell::RefCell;
+use std::marker::PhantomData;
+use std::sync::Arc;
 
 #[cfg(all(target_os = "windows", feature = "stream"))]
 use std::thread::JoinHandle;
@@ -263,19 +265,20 @@ mod ffi {
 pub use ffi::GrabStrategy;
 pub use ffi::TimeoutHandling;
 
-pub struct Pylon {}
-
-impl Pylon {
-    pub fn new() -> Self {
-        ffi::PylonInitialize();
-        Self {}
-    }
+mod private {
+    pub struct Private;
 }
 
-impl Default for Pylon {
-    fn default() -> Self {
+pub struct Pylon {
+    _private_marker: PhantomData<private::Private>,
+}
+
+impl Pylon {
+    pub fn new() -> Arc<Self> {
         ffi::PylonInitialize();
-        Self {}
+        Arc::new(Self {
+            _private_marker: PhantomData,
+        })
     }
 }
 
@@ -324,21 +327,21 @@ pub unsafe fn terminate(shutdown_logging: bool) {
 // Since in C++ `CTlFactory::GetInstance()` merely returns a reference to
 // a static object, here we don't store anything and instead get the
 // reference when needed.
-pub struct TlFactory<'a> {
-    lib: &'a Pylon,
+pub struct TlFactory {
+    lib: Arc<Pylon>,
 }
 
-impl<'a> TlFactory<'a> {
-    pub fn instance(lib: &'a Pylon) -> Self {
+impl TlFactory {
+    pub fn instance(lib: Arc<Pylon>) -> Self {
         Self { lib }
     }
-    pub fn create_first_device(&self) -> PylonResult<InstantCamera<'a>> {
+    pub fn create_first_device(&self) -> PylonResult<InstantCamera> {
         let inner = ffi::tl_factory_create_first_device()?;
-        Ok(InstantCamera::new(self.lib, inner))
+        Ok(InstantCamera::new(self.lib.clone(), inner))
     }
-    pub fn create_device(&self, device_info: &DeviceInfo) -> PylonResult<InstantCamera<'a>> {
+    pub fn create_device(&self, device_info: &DeviceInfo) -> PylonResult<InstantCamera> {
         let inner = ffi::tl_factory_create_device(&device_info.inner)?;
-        Ok(InstantCamera::new(self.lib, inner))
+        Ok(InstantCamera::new(self.lib.clone(), inner))
     }
     pub fn enumerate_devices(&self) -> PylonResult<Vec<DeviceInfo>> {
         let devs: cxx::UniquePtr<cxx::CxxVector<ffi::CDeviceInfo>> =
@@ -366,14 +369,14 @@ impl WaitObject {
 unsafe impl Send for WaitObject {}
 
 /// Wrap the CInstantCamera type
-pub struct InstantCamera<'a> {
-    #[allow(dead_code)]
-    lib: &'a Pylon,
+pub struct InstantCamera {
     inner: cxx::UniquePtr<ffi::CInstantCamera>,
     #[cfg(all(target_os = "linux", feature = "stream"))]
     fd: RefCell<Option<tokio::io::unix::AsyncFd<std::os::unix::io::RawFd>>>,
     #[cfg(all(target_os = "windows", feature = "stream"))]
     wait_thread: RefCell<Option<JoinHandle<()>>>,
+    #[allow(dead_code)]
+    lib: Arc<Pylon>,
 }
 
 /// Wrap the `GenApi::INodeMap` type.
@@ -575,10 +578,10 @@ impl CommandNode {
     }
 }
 
-unsafe impl Send for InstantCamera<'_> {}
+unsafe impl Send for InstantCamera {}
 
-impl<'a> InstantCamera<'a> {
-    pub fn new(lib: &'a Pylon, inner: cxx::UniquePtr<ffi::CInstantCamera>) -> Self {
+impl InstantCamera {
+    pub fn new(lib: Arc<Pylon>, inner: cxx::UniquePtr<ffi::CInstantCamera>) -> Self {
         InstantCamera {
             lib,
             inner,
@@ -679,7 +682,7 @@ impl<'a> InstantCamera<'a> {
 }
 
 /// These methods return the various node maps.
-impl<'a> InstantCamera<'a> {
+impl<'a> InstantCamera {
     pub fn node_map<'map>(&'a self) -> PylonResult<NodeMap<'map, 'a>> {
         Ok(NodeMap {
             inner: ffi::instant_camera_get_node_map(&self.inner)?,
