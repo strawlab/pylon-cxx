@@ -1,4 +1,4 @@
-#if defined(FEATURE_STREAM_LINUX)
+#if defined(FEATURE_STREAM_UNIX)
 #include <unistd.h>
 #include <fcntl.h>
 #endif
@@ -178,7 +178,7 @@ namespace Pylon
         return camera->IsGrabbing();
     }
 
-    #if defined(FEATURE_STREAM_LINUX)
+    #if defined(FEATURE_STREAM_UNIX)
     int instant_camera_wait_object_fd(const std::unique_ptr<CInstantCamera> &camera) {
       return camera->GetGrabResultWaitObject().GetFd();
     }

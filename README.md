@@ -10,7 +10,7 @@ Windows, linux, and macOS are all tested.
 
 ## async stream with tokio
 
-Enable async stream support using tokio with the cargo feature `stream`. 
+Enable async stream support using tokio with the cargo feature `stream`.
 
 ## Building
 

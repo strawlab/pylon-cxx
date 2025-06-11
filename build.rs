@@ -21,14 +21,11 @@ fn main() {
         .cpp(true)
         .include("include");
 
-    #[cfg(all(target_os = "linux", feature = "stream"))]
-    build.define("FEATURE_STREAM_LINUX", None);
+    #[cfg(all(not(target_os = "windows"), feature = "stream"))]
+    build.define("FEATURE_STREAM_UNIX", None);
 
     #[cfg(all(target_os = "windows", feature = "stream"))]
     build.define("FEATURE_STREAM_WINDOWS", None);
-
-    #[cfg(all(target_os = "macos", feature = "stream"))]
-    panic!("Stream feature not supported in macos");
 
     #[cfg(target_os = "linux")]
     {

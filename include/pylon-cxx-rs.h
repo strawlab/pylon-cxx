@@ -48,7 +48,7 @@ namespace Pylon
     void instant_camera_stop_grabbing(const std::unique_ptr<CInstantCamera> &);
     bool instant_camera_is_grabbing(const std::unique_ptr<CInstantCamera> &);
 
-    #if defined(FEATURE_STREAM_LINUX)
+    #if defined(FEATURE_STREAM_UNIX)
     int instant_camera_wait_object_fd(const std::unique_ptr<CInstantCamera> &);
     #endif
     #if defined(FEATURE_STREAM_WINDOWS)
