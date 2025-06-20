@@ -367,13 +367,15 @@ unsafe impl Send for WaitObject {}
 
 /// Wrap the CInstantCamera type
 pub struct InstantCamera<'a> {
-    #[allow(dead_code)]
-    lib: &'a Pylon,
     inner: cxx::UniquePtr<ffi::CInstantCamera>,
     #[cfg(all(not(target_os = "windows"), feature = "stream"))]
     fd: RefCell<Option<tokio::io::unix::AsyncFd<std::os::unix::io::RawFd>>>,
     #[cfg(all(target_os = "windows", feature = "stream"))]
     wait_thread: RefCell<Option<JoinHandle<()>>>,
+
+    /// A reference to the Pylon library. This should be the last field in the
+    /// struct so that `self._lib` is dropped after `self.inner`.
+    _lib: &'a Pylon,
 }
 
 /// Wrap the `GenApi::INodeMap` type.
@@ -580,7 +582,7 @@ unsafe impl Send for InstantCamera<'_> {}
 impl<'a> InstantCamera<'a> {
     pub fn new(lib: &'a Pylon, inner: cxx::UniquePtr<ffi::CInstantCamera>) -> Self {
         InstantCamera {
-            lib,
+            _lib: lib,
             inner,
             #[cfg(all(not(target_os = "windows"), feature = "stream"))]
             fd: RefCell::new(None),
