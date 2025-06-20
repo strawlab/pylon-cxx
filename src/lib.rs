@@ -668,12 +668,13 @@ impl<'a> InstantCamera<'a> {
     }
 
     #[cfg(all(not(target_os = "windows"), feature = "stream"))]
+    /// DEPRECATED: `get_grab_result_fd` will be made private.
     pub fn get_grab_result_fd(&self) -> PylonResult<std::os::unix::io::RawFd> {
         Ok(ffi::instant_camera_wait_object_fd(&self.inner))
     }
 
     #[cfg(all(target_os = "windows", feature = "stream"))]
-    pub fn get_grab_result_wait_object(&self) -> PylonResult<WaitObject> {
+    fn get_grab_result_wait_object(&self) -> PylonResult<WaitObject> {
         Ok(WaitObject(ffi::instant_camera_wait_object(&self.inner)))
     }
 }
