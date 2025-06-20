@@ -1,4 +1,4 @@
-use crate::{GrabOptions, Pylon, PylonError, PylonResult, TlFactory};
+use pylon_cxx::{GrabOptions, Pylon, PylonError, PylonResult, TlFactory};
 use tokio_stream::{StreamExt, StreamMap};
 
 #[tokio::test]

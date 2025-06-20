@@ -8,7 +8,6 @@ authors = [
     "Falco Hirschenberger <falco.hirschenberger@gmail.com>",
 ]
 edition = "2018"
-resolver = "2"
 repository = "https://github.com/strawlab/pylon-cxx"
 keywords = ["basler", "camera", "bindings", "pylon", "image"]
 categories = [
