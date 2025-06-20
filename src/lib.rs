@@ -19,9 +19,6 @@ use std::thread::JoinHandle;
 #[cfg(all(target_os = "windows", feature = "stream"))]
 mod stream_windows;
 
-#[cfg(all(test, feature = "stream"))]
-mod async_tests;
-
 #[derive(Debug)]
 pub struct PylonError {
     msg: String,
