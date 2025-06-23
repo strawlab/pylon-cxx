@@ -7,6 +7,7 @@ use std::backtrace::Backtrace;
 /// DEPRECATED: the `stream_unix` module exposes no public items and should not be used externally.
 pub mod stream_unix;
 
+#[cfg(all(not(target_os = "windows"), feature = "stream"))]
 /// DEPRECATED: the `stream` module exposes no public items and should not be used externally.
 pub use crate::stream_unix as stream;
 

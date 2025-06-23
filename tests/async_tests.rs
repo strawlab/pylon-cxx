@@ -1,3 +1,4 @@
+#![cfg(feature = "stream")]
 use pylon_cxx::{GrabOptions, Pylon, PylonError, PylonResult, TlFactory};
 use tokio_stream::{StreamExt, StreamMap};
 
